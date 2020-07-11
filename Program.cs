@@ -10,7 +10,6 @@ namespace RedPill
     {
         static void Main(string[] args)
         {
-
             //Create a simulation
             //Simulation userLand = new Simulation();
             //Set Defaults for simulation, can be overwritted by load from config file below

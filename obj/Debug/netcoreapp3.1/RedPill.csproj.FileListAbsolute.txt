@@ -24,3 +24,16 @@ C:\Users\david\Desktop\RedPill\obj\Debug\netcoreapp3.1\RedPill.csproj.CoreCompil
 C:\Users\david\Desktop\RedPill\obj\Debug\netcoreapp3.1\RedPill.dll
 C:\Users\david\Desktop\RedPill\obj\Debug\netcoreapp3.1\RedPill.pdb
 C:\Users\david\Desktop\RedPill\obj\Debug\netcoreapp3.1\RedPill.genruntimeconfig.cache
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.exe
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.deps.json
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.runtimeconfig.json
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.runtimeconfig.dev.json
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.dll
+C:\Users\cadet\Source\Repos\Templar88\RedPill\bin\Debug\netcoreapp3.1\RedPill.pdb
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.csprojAssemblyReference.cache
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.AssemblyInfoInputs.cache
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.AssemblyInfo.cs
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.csproj.CoreCompileInputs.cache
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.dll
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.pdb
+C:\Users\cadet\Source\Repos\Templar88\RedPill\obj\Debug\netcoreapp3.1\RedPill.genruntimeconfig.cache
