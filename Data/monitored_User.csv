@@ -1,0 +1,39 @@
+Monitored,Range
+Access tokens,.5;.5
+Anti-virus,.5;.5
+API monitoring,.5;.5
+Application logs,.5;.5
+Asset management,.5;.5
+Authentication logs,.5;.5
+Binary file metadata,.5;.5
+Data loss prevention,.5;.5
+Detonation chamber,.5;.5
+DLL monitoring,.5;.5
+DNS records,.5;.5
+Email gateway,.5;.5
+File monitoring,.5;.5
+Host network interface,.5;.5
+Kernel drivers,.5;.5
+Loaded DLLs,.5;.5
+Mail server,.5;.5
+Named Pipes,.5;.5
+Netflow/Enclave netflow,.5;.5
+Network device logs,.5;.5
+Network intrusion detection system,.5;.5
+Network protocol analysis,.5;.5
+Packet capture,.5;.5
+PowerShell logs,.5;.5
+Process command-line parameters,.5;.5
+Process monitoring,.5;.5
+Process use of network,.5;.5
+Services,.5;.5
+SSL/TLS inspection,.5;.5
+System calls,.5;.5
+Third-party application logs,.5;.5
+User interface,.5;.5
+Web application firewall logs,.5;.5
+Web logs,.5;.5
+Web proxy,.5;.5
+Windows Error Reporting,.5;.5
+Windows event logs,.5;.5
+Windows Registry,.5;.5

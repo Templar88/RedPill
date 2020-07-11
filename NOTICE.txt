@@ -1,0 +1,3 @@
+This program was conceived of and written by David Hyde-Volpe with significant
+feedback ideas and help from several individuals which will be added to this file if
+they elect to be.
