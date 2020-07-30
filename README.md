@@ -1,6 +1,6 @@
 # RedPill
 
-RedPill is a simulation written in c# that computes the probability of a threat actor breaching an organization. The actions of the threat actors match the distribution of known bad actor and/or malicious software actions as put forward by the Mitre ATT&CK Framework. The simulated organization can mitigate or detect the actors by employing mitigations or monitorign data sources as laid out by the same framework.
+RedPill is a simulation written in c# that computes the probability of a threat actor breaching an organization. The actions of the threat actors match the distribution of known bad actor and/or malicious software actions as put forward by the Mitre ATT&CK Framework and Mitre Cyber Threat Intelligence. The simulated organization can block or detect the actors by employing mitigations or monitoring data sources as laid out by the same framework.
 
 ## Usage
 
