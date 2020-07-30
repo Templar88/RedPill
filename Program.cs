@@ -12,12 +12,12 @@ namespace RedPill
         {
             //Create a simulation
             //Simulation userLand = new Simulation();
-            //Set Defaults for simulation, can be overwritted by load from config file below
-            int numScriptKiddies = 0;
-            int numFMA = 20000;
-            int numLowAndSlow = 80000;
-            int userLandRebootTimer = 480; //in minutes
-            int serverLandRebootTimer = 10000; //in minutes
+            //Sets Defaults for simulation, can be overwritted by load from config file below *RECOMMENDED*
+            int numScriptKiddies = 0; // Low-Skilled actors
+            int numFMA = 20000; // Financially Motivated actors
+            int numLowAndSlow = 80000; // RedTeam or Nation-State style actors
+            int userLandRebootTimer = 480; //Average time until device reboot in minutes
+            int serverLandRebootTimer = 10000; //Average time until device reboot in minutes
             string environmentChain = "User,DMZ,Server";
             string setMitigation = "none", setDataSource = "none";
             string valueMit = "0;0", valueData = "0;0";
@@ -50,7 +50,6 @@ namespace RedPill
                         userLandRebootTimer = Int32.Parse(lines[3].Split('=')[1]);
                         serverLandRebootTimer = Int32.Parse(lines[4].Split('=')[1]);
                         environmentChain = lines[5].Split('=')[1];
-                        //System.Environment.Exit(0); //delete me
                     }
                     catch (System.IO.FileNotFoundException e)
                     {
@@ -59,13 +58,13 @@ namespace RedPill
                     }
                 }
             }
-            // j determines which portion of confidence interval we are in 0,low 1,average 2,high
+            // j determines which portion of confidence interval we are in 0=low 1=average 2=high
             for (int j = 0; j < 3; j++)
 			{
                 int runNumScriptKiddies = numScriptKiddies;
                 int runNumFMA = numFMA;
                 int runNumLowAndSlow = numLowAndSlow;
-            
+                // Loop through the defined environments
                 for(int i=0;i<environmentChain.Split(',').Length;i++)
                 {
                     //Console.WriteLine(environmentChain.Split(',')[i]);
@@ -73,7 +72,8 @@ namespace RedPill
                     Simulation.EnvironmentType runEnvironment;
                     System.Enum.TryParse(environmentChain.Split(',')[i], out runEnvironment);
                     int tempRebootTimer;
-                    if( runEnvironment == Simulation.EnvironmentType.User)
+                    // If new custom environments added may need to add logic here to handle proper timer
+                    if(runEnvironment == Simulation.EnvironmentType.User)
                     {
                         tempRebootTimer = userLandRebootTimer;
                     }
