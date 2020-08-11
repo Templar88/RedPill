@@ -5,22 +5,29 @@ API monitoring,.5;.5
 Application logs,.5;.5
 Asset management,.5;.5
 Authentication logs,.5;.5
+AWS CloudTrail logs,.5;.5
+Azure activity logs,.5;.5
+BIOS,.5;.5
 Binary file metadata,.5;.5
 Data loss prevention,.5;.5
 Detonation chamber,.5;.5
 DLL monitoring,.5;.5
 DNS records,.5;.5
 Email gateway,.5;.5
+Environment variable,.5;.5
 File monitoring,.5;.5
 Host network interface,.5;.5
 Kernel drivers,.5;.5
 Loaded DLLs,.5;.5
 Mail server,.5;.5
+Malware reverse engineering,.5;.5
+MBR,.5;.5
 Named Pipes,.5;.5
 Netflow/Enclave netflow,.5;.5
 Network device logs,.5;.5
 Network intrusion detection system,.5;.5
 Network protocol analysis,.5;.5
+Office 365 account logs,.5;.5
 Packet capture,.5;.5
 PowerShell logs,.5;.5
 Process command-line parameters,.5;.5
@@ -28,6 +35,7 @@ Process monitoring,.5;.5
 Process use of network,.5;.5
 Services,.5;.5
 SSL/TLS inspection,.5;.5
+Stackdriver logs,.5;.5
 System calls,.5;.5
 Third-party application logs,.5;.5
 User interface,.5;.5

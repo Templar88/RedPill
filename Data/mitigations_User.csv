@@ -3,6 +3,7 @@ M1036,Account Use Policies,Configure features related to account use like login 
 M1015,Active Directory Configuration,Configure Active Directory to prevent use of certain techniques; use SID Filtering etc.,.5;.5
 M1049,Antivirus/Antimalware,Use signatures or heuristics to detect malicious software.,.5;.5
 M1048,Application Isolation and Sandboxing,Restrict execution of code to a virtual environment on or in transit to an endpoint system.,.5;.5
+M1013,Application Developer Guidance,This mitigation describes any guidance or training given to developers of applications to avoid introducing security weaknesses that an adversary may be able to take advantage of.,.5;.5
 M1047,Audit,Perform audits or scans of systems permissions insecure software insecure configurations etc. to identify potential weaknesses.,.5;.5
 M1040,Behavior Prevention on Endpoint,Use capabilities to prevent suspicious behavior patterns from occurring on endpoint systems. This could include suspicious process file API call etc. behavior.,.5;.5
 M1046,Boot Integrity,Use secure methods to boot a system and verify the integrity of the operating system and loading mechanisms.,.5;.5

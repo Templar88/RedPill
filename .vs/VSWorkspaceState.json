@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Data"
   ],
-  "SelectedNode": "\\RedPill.csproj",
+  "SelectedNode": "\\Data\\mitigation_source.csv",
   "PreviewInSolutionExplorer": false
 }

@@ -131,6 +131,10 @@ namespace RedPill
         public List<string> groupWeightedPrivilegeEscalationList = new List<string>();
         public List<string> softwareWeightedPrivilegeEscalationList = new List<string>();
 
+        public List<string> defenseEvasionList = new List<string>();
+        public List<string> groupWeightedDefenseEvasionList = new List<string>();
+        public List<string> softwareWeightedDefenseEvasionList = new List<string>();
+
         public List<string> credentialAccessList = new List<string>();
         public List<string> groupWeightedCredentialAccessList = new List<string>();
         public List<string> softwareWeightedCredentialAccessList = new List<string>();
@@ -170,7 +174,7 @@ namespace RedPill
         private string tempStage;
         public string setMitigation, setDataSource;
         public string valueMit, ValueData;
-        public enum stage{InitialAccess,Execution,Persistence,PrivilegeEscalation,CredentialAccess,LateralMovement,Collection,Exfiltration}
+        public enum stage{InitialAccess,Execution,Persistence,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Collection,Exfiltration}
         public enum bonusStage{Persistence,DefenseEvasion,Discovery,CommandAndControl}
         public enum simulationType{tool,technology}
         public simulationType mySimType = simulationType.tool;
@@ -498,7 +502,7 @@ namespace RedPill
 
         public void LoadTTP()
         {
-            using(var reader = new StreamReader(@"Data/tool.csv"))
+            using(var reader = new StreamReader(@"Data/TTP.csv"))
             {
                 int i = 0;
                 int k = 1;
@@ -563,27 +567,32 @@ namespace RedPill
                                 softwareWeightedPrivilegeEscalationList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
                                 break;
                             case 6:
+                                defenseEvasionList.Add(values[1]);
+                                groupWeightedDefenseEvasionList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[2])));
+                                softwareWeightedDefenseEvasionList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
+                                break;
+                            case 7:
                                 credentialAccessList.Add(values[1]);
                                 groupWeightedCredentialAccessList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[2])));
                                 softwareWeightedCredentialAccessList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
                                 break;                           
-                            case 7:
+                            case 8:
                                 lateralMovementList.Add(values[1]);
                                 groupWeightedLateralMovementList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[2])));
                                 softwareWeightedLateralMovementList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
                                 break;
-                            case 8:
+                            case 9:
                                 collectionList.Add(values[1]);
                                 groupWeightedCollectionList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[2])));
                                 softwareWeightedCollectionList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
                                 break;
-                            case 9:
+                            case 10:
                                 exfiltrationList.Add(values[1]);
                                 groupWeightedExfiltrationList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[2])));
                                 softwareWeightedExfiltrationList.AddRange(Enumerable.Repeat(tempStage+values[1], Int32.Parse(values[3])));
                                 break;
                             default:
-                                Console.WriteLine(k.ToString() + "Overflow of Mitre Verticals Mitre.cs Line 92.  Check tool.csv file.");
+                                Console.WriteLine(k.ToString() + "Overflow of Mitre Verticals Mitre.cs.  Check TTP.csv file.");
                                 break;
                         }
 

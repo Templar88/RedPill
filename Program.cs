@@ -42,7 +42,6 @@ namespace RedPill
                 {
                     try
                     {
-                        //Console.WriteLine(args[i+1]);
                         string[] lines = System.IO.File.ReadAllLines(@"Config\" + args[i+1]);
                         numScriptKiddies = Int32.Parse(lines[0].Split('=')[1]);
                         numFMA = Int32.Parse(lines[1].Split('=')[1]);
@@ -81,11 +80,14 @@ namespace RedPill
                     {
                         tempRebootTimer = serverLandRebootTimer;
                     }
+
                     sim.init(j, runNumScriptKiddies, runNumFMA, runNumLowAndSlow, Mitre.simulationType.technology, runEnvironment, tempRebootTimer, setMitigation, valueMit, setDataSource, valueData);
+                    //Main Execution Loop
                     while(!sim.isFinished)
                     {
                         sim.update();
                     }
+                    //update number of surviving agents
                     runNumScriptKiddies = sim.aggregateData.totalSuccessByType[(int)Agent.agentType.ScriptKiddie];
                     runNumFMA = sim.aggregateData.totalSuccessByType[(int)Agent.agentType.FMA];
                     runNumLowAndSlow = sim.aggregateData.totalSuccessByType[(int)Agent.agentType.LowAndSlow];
@@ -104,6 +106,7 @@ namespace RedPill
         public int[] totalSuccessByType;
         public int[] totalFailureByType;
         //failure from agent point of view
+        public int runningFailureCount = 0;
         public int totalFailure = 0;
         public int totalBlocksByDetection = 0;
         public int totalBlocksByReboot = 0;
@@ -115,8 +118,10 @@ namespace RedPill
         public int[] totalControlSoftBlocks;
         public int[] totalControlDetects;        
         public int[] totalTechnologyBlocks;
+        public double[] totalTechnologyBlocksScore;
         public int[] totalTechnologySoftBlocks;
         public int[] totalTechnologyDetects;
+        public double[] totalTechnologyDetectsScore;
         public int[] totalBlockedStages;
         public int[] totalSuccessStages;
 
@@ -128,8 +133,10 @@ namespace RedPill
             totalControlSoftBlocks = new int[mitreInfo.controlObjectList.Count];
             totalControlDetects = new int[mitreInfo.controlObjectList.Count];
             totalTechnologyBlocks = new int[mitreInfo.mitigationList.Count];
+            totalTechnologyBlocksScore = new double[mitreInfo.mitigationList.Count];
             totalTechnologySoftBlocks = new int[mitreInfo.mitigationList.Count];
             totalTechnologyDetects = new int[mitreInfo.sourceList.Count];
+            totalTechnologyDetectsScore = new double[mitreInfo.sourceList.Count];
             totalTTPBlocks = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalTTPDetects = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalTTPSuccesses = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
@@ -155,6 +162,7 @@ namespace RedPill
         public int[] blockedStage;
         public string[] successTTP = new string[Enum.GetNames(typeof(Mitre.stage)).Length];
         public List<Event> events = new List<Event>();
+        public int failureID;
     }
     public class Agent
     {
@@ -178,6 +186,8 @@ namespace RedPill
         public List<string> knownPersistenceSkillList;
         public List<string> privilegeEscalationSkillList;
         public List<string> knownPrivilegeEscalationSkillList;
+        public List<string> defenseEvasionSkillList;
+        public List<string> knownDefenseEvasionSkillList;
         public List<string> credentialAccessSkillList;
         public List<string> knownCredentialAccessSkillList;
         public List<string> lateralMovementSkillList;
@@ -187,6 +197,8 @@ namespace RedPill
         public List<string> exfiltrationSkillList;
         public List<string> knownExfiltrationSkillList;
 
+        //total number of agents...used to compute blockscore
+        public int numAgents = 0;
         // Time in minutes that agent has been potentially detectable
         public double alertTimer = 0.0;
         // Time in minutes agent has been on network
@@ -197,9 +209,9 @@ namespace RedPill
         public double rebootTimer = 480;
         //Time in minutes to execute a technique  60 default 120 for low and slow actors
         public double techniqueCost = 60;
-        //Current Agent evasion rating
+        //Current Agent evasion rating...can be raised by using defensive evasion techniques
         public float defenseEvasion = 0.0f;
-        public int initialAccessIndex, executionIndex, persistenceIndex, privilegeEscalationIndex, credentialAccessIndex, lateralMovementIndex, collectionIndex, exfiltrationIndex, agentID, confidenceBand;
+        public int initialAccessIndex, executionIndex, persistenceIndex, privilegeEscalationIndex, defenseEvasionIndex, credentialAccessIndex, lateralMovementIndex, collectionIndex, exfiltrationIndex, agentID, confidenceBand;
         public bool skillsSet, hasAlerted, isDetected, isBlocked, hasPersistence;
 
 
@@ -209,7 +221,7 @@ namespace RedPill
             mitreInfo = mitreObj;
  
             skillsSet = hasAlerted = isDetected = isBlocked = false;
-            initialAccessIndex = executionIndex = persistenceIndex = privilegeEscalationIndex = credentialAccessIndex = lateralMovementIndex = collectionIndex = exfiltrationIndex = 0;
+            initialAccessIndex = executionIndex = persistenceIndex = privilegeEscalationIndex = defenseEvasionIndex = credentialAccessIndex = lateralMovementIndex = collectionIndex = exfiltrationIndex = 0;
             myResultData = new ResultData();
             agentID = ID;
             aggregateData = aggData;
@@ -238,6 +250,9 @@ namespace RedPill
                         break;
                     case Mitre.stage.PrivilegeEscalation:
                         tempSkills.Add(mitreInfo.groupWeightedPrivilegeEscalationList[r.Next(0,mitreInfo.groupWeightedPrivilegeEscalationList.Count)]);
+                        break;
+                    case Mitre.stage.DefenseEvasion:
+                        tempSkills.Add(mitreInfo.groupWeightedDefenseEvasionList[r.Next(0,mitreInfo.groupWeightedDefenseEvasionList.Count)]);
                         break;
                     case Mitre.stage.CredentialAccess:
                         tempSkills.Add(mitreInfo.groupWeightedCredentialAccessList[r.Next(0,mitreInfo.groupWeightedCredentialAccessList.Count)]);
@@ -279,6 +294,9 @@ namespace RedPill
                     case Mitre.stage.PrivilegeEscalation:
                         tempSkills.Add(mitreInfo.softwareWeightedPrivilegeEscalationList[r.Next(0,mitreInfo.softwareWeightedPrivilegeEscalationList.Count)]);
                         break;
+                    case Mitre.stage.DefenseEvasion:
+                        tempSkills.Add(mitreInfo.softwareWeightedDefenseEvasionList[r.Next(0,mitreInfo.softwareWeightedDefenseEvasionList.Count)]);
+                        break;
                     case Mitre.stage.CredentialAccess:
                         tempSkills.Add(mitreInfo.softwareWeightedCredentialAccessList[r.Next(0,mitreInfo.softwareWeightedCredentialAccessList.Count)]);
                         break;
@@ -310,6 +328,7 @@ namespace RedPill
                         knownExecutionSkillList = getKnownSkillsSoftware(Mitre.stage.Execution,1);
                         knownPersistenceSkillList = getKnownSkillsSoftware(Mitre.stage.Persistence,0);
                         knownPrivilegeEscalationSkillList = getKnownSkillsSoftware(Mitre.stage.PrivilegeEscalation,1);
+                        knownDefenseEvasionSkillList = getKnownSkillsGroup(Mitre.stage.DefenseEvasion,1);
                         knownCredentialAccessSkillList = getKnownSkillsSoftware(Mitre.stage.CredentialAccess,1);
                         knownLateralMovementSkillList = getKnownSkillsSoftware(Mitre.stage.LateralMovement,1);
                         knownCollectionSkillList = getKnownSkillsSoftware(Mitre.stage.Collection,1);
@@ -321,8 +340,9 @@ namespace RedPill
                     {
                         knownInitAccessSkillList = getKnownSkillsGroup(Mitre.stage.InitialAccess,1);
                         knownExecutionSkillList = getKnownSkillsGroup(Mitre.stage.Execution,4);
-                        knownPersistenceSkillList = getKnownSkillsGroup(Mitre.stage.Persistence,0);
+                        knownPersistenceSkillList = getKnownSkillsGroup(Mitre.stage.Persistence,3);
                         knownPrivilegeEscalationSkillList = getKnownSkillsGroup(Mitre.stage.PrivilegeEscalation,4);
+                        knownDefenseEvasionSkillList = getKnownSkillsGroup(Mitre.stage.DefenseEvasion,2);
                         knownCredentialAccessSkillList = getKnownSkillsGroup(Mitre.stage.CredentialAccess,3);
                         knownLateralMovementSkillList = getKnownSkillsGroup(Mitre.stage.LateralMovement,3);
                         knownCollectionSkillList = getKnownSkillsGroup(Mitre.stage.Collection,3);
@@ -335,11 +355,12 @@ namespace RedPill
                         knownExecutionSkillList = getKnownSkillsGroup(Mitre.stage.Execution,4);
                         knownPersistenceSkillList = getKnownSkillsGroup(Mitre.stage.Persistence,6);
                         knownPrivilegeEscalationSkillList = getKnownSkillsGroup(Mitre.stage.PrivilegeEscalation,4);
+                        knownDefenseEvasionSkillList = getKnownSkillsGroup(Mitre.stage.DefenseEvasion,6);
                         knownCredentialAccessSkillList = getKnownSkillsGroup(Mitre.stage.CredentialAccess,3);
                         knownLateralMovementSkillList = getKnownSkillsGroup(Mitre.stage.LateralMovement,3);
                         knownCollectionSkillList = getKnownSkillsGroup(Mitre.stage.Collection,3);
                         knownExfiltrationSkillList = getKnownSkillsGroup(Mitre.stage.Exfiltration,6);
-                        //set evasion  KLUDGE
+                        //set default evasion
                         defenseEvasion = 0.2f;
                     }
                     break;
@@ -362,6 +383,9 @@ namespace RedPill
                     break;
                 case Mitre.stage.PrivilegeEscalation:
                     privilegeEscalationSkillList = skills;
+                    break;
+                case Mitre.stage.DefenseEvasion:
+                    defenseEvasionSkillList = skills;
                     break;
                 case Mitre.stage.CredentialAccess:
                     credentialAccessSkillList = skills;
@@ -392,6 +416,8 @@ namespace RedPill
                     return knownPersistenceSkillList[index];
                 case Mitre.stage.PrivilegeEscalation:
                     return knownPrivilegeEscalationSkillList[index];
+                case Mitre.stage.DefenseEvasion:
+                    return knownDefenseEvasionSkillList[index];
                 case Mitre.stage.CredentialAccess:
                     return knownCredentialAccessSkillList[index];
                 case Mitre.stage.LateralMovement:
@@ -451,6 +477,8 @@ namespace RedPill
                             if(initialAccessIndex == knownInitAccessSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -468,6 +496,8 @@ namespace RedPill
                             if(initialAccessIndex == knownInitAccessSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -493,6 +523,8 @@ namespace RedPill
                             if(executionIndex == knownExecutionSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -538,7 +570,31 @@ namespace RedPill
                             if(privilegeEscalationIndex == knownPrivilegeEscalationSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
+                                return false;
+                            }
+                        }
+                    }
+                    break;
+                    case Mitre.stage.DefenseEvasion:
+                    if(defenseEvasionIndex < knownDefenseEvasionSkillList.Count)
+                    {
+                        //use skill
+                        if(handleEvent(mitreInfo.tryTTP(confidenceBand,knownDefenseEvasionSkillList[defenseEvasionIndex],"default",agentID, Mitre.stage.DefenseEvasion, defenseEvasion)))
+                        {
+                            myResultData.successTTP[(int)Mitre.stage.DefenseEvasion] = knownDefenseEvasionSkillList[defenseEvasionIndex];
+                            myResultData.successStage[(int)stage] = 1;
+                            attackSuccess = true;
+                            defenseEvasion += 0.05f;  //need to analyze/benchmark/gather info
+                            return attackSuccess;
+                        }
+                        else
+                        {
+                            defenseEvasionIndex++;
+                            if(defenseEvasionIndex == knownDefenseEvasionSkillList.Count)
+                            {
                                 return false;
                             }
                         }
@@ -561,6 +617,8 @@ namespace RedPill
                             if(credentialAccessIndex == knownCredentialAccessSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -584,6 +642,8 @@ namespace RedPill
                             if(lateralMovementIndex == knownLateralMovementSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -607,6 +667,8 @@ namespace RedPill
                             if(collectionIndex == knownCollectionSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -630,6 +692,8 @@ namespace RedPill
                             if(exfiltrationIndex == knownExfiltrationSkillList.Count)
                             {
                                 myResultData.blockedStage[(int)stage] = 1;
+                                aggregateData.runningFailureCount++;
+                                myResultData.failureID = aggregateData.runningFailureCount;
                                 isBlocked = true;
                                 return false;
                             }
@@ -739,6 +803,7 @@ namespace RedPill
                             for(int j=0;j<myResultData.events[i].blockedByList.Count;j++)
                             {
                                 aggregateData.totalTechnologyBlocks[mitreInfo.MitigationNameToIndexValue(myResultData.events[i].blockedByList[j])]++;
+                                aggregateData.totalTechnologyBlocksScore[mitreInfo.MitigationNameToIndexValue(myResultData.events[i].blockedByList[j])] += 1.0/(numAgents - myResultData.failureID);
                             }
                         }  
                         if(myResultData.events[i].wasSoftBlocked)
@@ -754,6 +819,7 @@ namespace RedPill
                             {
                                 //Console.WriteLine(mitreInfo.SourceNameToIndexValue(myResultData.events[i].detectedByList[j]));
                                 aggregateData.totalTechnologyDetects[mitreInfo.SourceNameToIndexValue(myResultData.events[i].detectedByList[j])]++;
+                                aggregateData.totalTechnologyDetectsScore[mitreInfo.SourceNameToIndexValue(myResultData.events[i].detectedByList[j])] += 1.0/(numAgents - myResultData.failureID);
                             }
                         }
                         break;
@@ -808,7 +874,7 @@ namespace RedPill
         public AggregateData aggregateData;
         public enum EnvironmentType{User,Server,Retail,DMZ,ExternalServer}// user = user endpoints, server = internal servers, retail = retail store, DMZ = external facing servers (no crit data), ExternalServer = internal server that is exposed to web
         EnvironmentType myEnvironment;
-        public int numIterations, numScriptKiddies, numFMA, numLowAndSlow, currentIteration, confidenceBand;
+        public int numIterations, numScriptKiddies, numFMA, numLowAndSlow, numAgents, currentIteration, confidenceBand;
         public bool isFinished;
         public string setMitigation, setDataSource, valueMit, valueData;
         public void init(int tempConfidenceBand, int tempNumScriptKiddies, int tempNumFMA, int tempNumLowAndSlow, Mitre.simulationType type, EnvironmentType environmentType, int rebootTime, string tempSetMitigation, string tempValueMit, string tempSetDataSource, string tempValueData)
@@ -826,7 +892,8 @@ namespace RedPill
             valueMit = tempValueMit;
             setDataSource = tempSetDataSource;
             valueData = tempValueData;
-            agents = new Agent[numScriptKiddies + numFMA + numLowAndSlow];
+            numAgents = numScriptKiddies + numFMA + numLowAndSlow;
+            agents = new Agent[numAgents];
             //Create Data object to store/Load all mitre related data
             mitreInfo = new Mitre(setMitigation, valueMit, setDataSource,valueData, myEnvironment);
             mitreInfo.mySimType = type;
@@ -845,6 +912,7 @@ namespace RedPill
                 agents[i].setSkillList(Mitre.stage.InitialAccess, mitreInfo.initialAccessList);
                 agents[i].setSkillList(Mitre.stage.Execution, mitreInfo.executionList);
                 agents[i].setSkillList(Mitre.stage.PrivilegeEscalation, mitreInfo.privilegeEscalationList);
+                agents[i].setSkillList(Mitre.stage.DefenseEvasion, mitreInfo.defenseEvasionList);
                 agents[i].setSkillList(Mitre.stage.CredentialAccess, mitreInfo.credentialAccessList);
                 agents[i].setSkillList(Mitre.stage.LateralMovement, mitreInfo.lateralMovementList);
                 agents[i].setSkillList(Mitre.stage.Collection, mitreInfo.collectionList);
@@ -852,6 +920,7 @@ namespace RedPill
                 agents[i].setType(Agent.agentType.ScriptKiddie);
                 agents[i].rebootTimer = rebootTime;
                 agents[i].confidenceBand = confidenceBand;
+                agents[i].numAgents = numAgents;
             }
             for(int i=numScriptKiddies;i<(numFMA+numScriptKiddies);i++)
             {
@@ -859,6 +928,7 @@ namespace RedPill
                 agents[i].setSkillList(Mitre.stage.InitialAccess, mitreInfo.initialAccessList);
                 agents[i].setSkillList(Mitre.stage.Execution, mitreInfo.executionList);
                 agents[i].setSkillList(Mitre.stage.PrivilegeEscalation, mitreInfo.privilegeEscalationList);
+                agents[i].setSkillList(Mitre.stage.DefenseEvasion, mitreInfo.defenseEvasionList);
                 agents[i].setSkillList(Mitre.stage.CredentialAccess, mitreInfo.credentialAccessList);
                 agents[i].setSkillList(Mitre.stage.LateralMovement, mitreInfo.lateralMovementList);
                 agents[i].setSkillList(Mitre.stage.Collection, mitreInfo.collectionList);
@@ -866,7 +936,7 @@ namespace RedPill
                 agents[i].setType(Agent.agentType.FMA);
                 agents[i].rebootTimer = rebootTime;
                 agents[i].confidenceBand = confidenceBand;
-
+                agents[i].numAgents = numAgents;
             }            
             for(int i=(numScriptKiddies+numFMA);i<(numFMA+numScriptKiddies+numLowAndSlow);i++)
             {
@@ -875,14 +945,16 @@ namespace RedPill
                 agents[i].setSkillList(Mitre.stage.Execution, mitreInfo.executionList);
                 agents[i].setSkillList(Mitre.stage.Persistence, mitreInfo.persistenceList);
                 agents[i].setSkillList(Mitre.stage.PrivilegeEscalation, mitreInfo.privilegeEscalationList);
+                agents[i].setSkillList(Mitre.stage.DefenseEvasion, mitreInfo.defenseEvasionList);
                 agents[i].setSkillList(Mitre.stage.CredentialAccess, mitreInfo.credentialAccessList);
                 agents[i].setSkillList(Mitre.stage.LateralMovement, mitreInfo.lateralMovementList);
                 agents[i].setSkillList(Mitre.stage.Collection, mitreInfo.collectionList);
                 agents[i].setSkillList(Mitre.stage.Exfiltration, mitreInfo.exfiltrationList);
                 agents[i].setType(Agent.agentType.LowAndSlow);
-                agents[i].techniqueCost = 120;
+                agents[i].techniqueCost = 120; //they are moving slower...
                 agents[i].rebootTimer = rebootTime;
                 agents[i].confidenceBand = confidenceBand;
+                agents[i].numAgents = numAgents;
             }
         }
         public void update()
@@ -896,12 +968,15 @@ namespace RedPill
                     simulateStep(Mitre.stage.Execution);
                     simulateStep(Mitre.stage.Persistence);
                     simulateStep(Mitre.stage.PrivilegeEscalation);
+                    simulateStep(Mitre.stage.DefenseEvasion);
                     simulateStep(Mitre.stage.CredentialAccess);
                     simulateStep(Mitre.stage.LateralMovement);
                     break;
 
                 case EnvironmentType.Server:
+                    simulateStep(Mitre.stage.Persistence);
                     simulateStep(Mitre.stage.PrivilegeEscalation);
+                    simulateStep(Mitre.stage.DefenseEvasion);
                     simulateStep(Mitre.stage.CredentialAccess);
                     simulateStep(Mitre.stage.LateralMovement);
                     simulateStep(Mitre.stage.Collection);
@@ -911,7 +986,9 @@ namespace RedPill
                 case EnvironmentType.Retail:
                     simulateStep(Mitre.stage.InitialAccess);
                     simulateStep(Mitre.stage.Execution);
+                    simulateStep(Mitre.stage.Persistence);
                     simulateStep(Mitre.stage.PrivilegeEscalation);
+                    simulateStep(Mitre.stage.DefenseEvasion);
                     simulateStep(Mitre.stage.CredentialAccess);
                     simulateStep(Mitre.stage.LateralMovement);
                     simulateStep(Mitre.stage.Collection);
@@ -920,14 +997,18 @@ namespace RedPill
                 case EnvironmentType.DMZ:
                     simulateStep(Mitre.stage.InitialAccess);
                     simulateStep(Mitre.stage.Execution);
+                    simulateStep(Mitre.stage.Persistence);
                     simulateStep(Mitre.stage.PrivilegeEscalation);
+                    simulateStep(Mitre.stage.DefenseEvasion);
                     simulateStep(Mitre.stage.CredentialAccess);
                     simulateStep(Mitre.stage.LateralMovement);
                     break;
                 case EnvironmentType.ExternalServer:
                     simulateStep(Mitre.stage.InitialAccess);
                     simulateStep(Mitre.stage.Execution);
+                    simulateStep(Mitre.stage.Persistence);
                     simulateStep(Mitre.stage.PrivilegeEscalation);
+                    simulateStep(Mitre.stage.DefenseEvasion);
                     simulateStep(Mitre.stage.CredentialAccess);
                     simulateStep(Mitre.stage.LateralMovement);
                     simulateStep(Mitre.stage.Collection);
@@ -989,6 +1070,7 @@ namespace RedPill
                 //if(aggregateData.totalTechnologyBlocks[i] > 0)
                 //{
                     Console.WriteLine("Total Blocks by " + mitreInfo.mitigationList[i].name + ": " + aggregateData.totalTechnologyBlocks[i]);
+                    Console.WriteLine("Total BlocksScore by " + mitreInfo.mitigationList[i].name + ": " + aggregateData.totalTechnologyBlocksScore[i]);
                 //}
             }
             for(int i=0;i<aggregateData.totalTechnologySoftBlocks.Length;i++)
@@ -1003,6 +1085,7 @@ namespace RedPill
                 //if(aggregateData.totalTechnologyDetects[i] > 0)
                 //{
                     Console.WriteLine("Total Detects by " + mitreInfo.sourceList[i].name + ": " + aggregateData.totalTechnologyDetects[i]);
+                    Console.WriteLine("Total DetectsScore by " + mitreInfo.sourceList[i].name + ": " + aggregateData.totalTechnologyDetectsScore[i]);
                 //}
             }
 
@@ -1080,6 +1163,15 @@ namespace RedPill
                         for(int j=0;j<agents[i].knownPrivilegeEscalationSkillList.Count;j++)
                         {
                             if(agents[i].trySkill(Mitre.stage.PrivilegeEscalation))
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    case Mitre.stage.DefenseEvasion:
+                        for(int j=0;j<agents[i].knownDefenseEvasionSkillList.Count;j++)
+                        {
+                            if(agents[i].trySkill(Mitre.stage.DefenseEvasion))
                             {
                                 break;
                             }

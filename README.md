@@ -11,7 +11,7 @@ Set overall simulation details in Config\SimConfig\_Default.
 
 To Start simulation run the following in the top level directory:
 ```powershell
-dotnet run -File Config\SimConfig_Default
+dotnet run -File SimConfig_Default.txt
 
 ```
 
