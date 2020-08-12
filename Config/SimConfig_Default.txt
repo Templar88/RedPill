@@ -1,9 +1,11 @@
-numScriptKiddies=1000
-numFMA=1000
-numLowAndSlow=1000
+numScriptKiddies=0
+numFMA=0
+numLowAndSlow=0
+numRedTeamer=1000
 userLandRebootTimer=480
 serverLandRebootTimer=10000
-environmentAttackChain=User,DMZ,Server
+alertSLA=1440
+environmentAttackChain=User,Server
 
 ----Make no change above besides values to configurable values--- 
 #comments go down here
@@ -12,3 +14,4 @@ environmentAttackChain=User,DMZ,Server
 #the environment attack chain variable is case sensitive options currently include (User,DMZ,Server,Retail,ExternalServer)
 #serverLandRebootTimer is used by DMZ Server Retail and ExternalServer
 #rebootTimer is in minutes
+#Alert SLA is in minutes

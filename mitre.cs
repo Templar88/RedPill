@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
+using System.Runtime.InteropServices;
 
 namespace RedPill
 {
@@ -72,8 +73,11 @@ namespace RedPill
         public bool wasDetected = false;
         public bool savedByShield = false;
         public List<string> detectedByList = new List<string>();
+        public List<double> detectedByScoreList = new List<double>();
         public List<string> blockedByList = new List<string>();
+        public List<double> blockedByScoreList = new List<double>();
         public List<string> softBlockedByList = new List<string>();
+        public List<double> softBlockedByScoreList = new List<double>();
         public Mitre.stage currentStage;
         public string TTPName;
 
@@ -226,7 +230,7 @@ namespace RedPill
         {
             return sourceList;
         }
-        public Event tryTTP(int confBand, string nameTTP, string location, int tempAgentID, stage currentStage, float tempEvasionShield)
+        public Event tryTTP(int confBand, string nameTTP, string location, int tempAgentID, stage currentStage, float tempEvasionShield, int agentsRemaining)
         {
             int index = TTPNameToIndexValue(nameTTP);
             Random r = new Random();
@@ -283,6 +287,7 @@ namespace RedPill
                 case simulationType.technology:
                     int sourceMapDataIndex = SourceMapDataTTPNameToIndexValue(nameTTP);
                     int mitigationMapDataIndex = MitigationMapDataTTPNameToIndexValue(nameTTP);
+                    //Console.WriteLine("trying skill: " + nameTTP);
                     //rand = r.NextDouble();
                     //Console.WriteLine(nameTTP + " " + sourceMapDataIndex);
                     if(sourceMapDataObjectList[sourceMapDataIndex].isMonitored)
@@ -309,6 +314,7 @@ namespace RedPill
                             {
                                 tempEvent.wasDetected = true;
                                 tempEvent.detectedByList.Add(sourceMapDataObjectList[sourceMapDataIndex].sources[i]);
+                                tempEvent.detectedByScoreList.Add(1.0/agentsRemaining);
                             }
                         }
                     }
@@ -327,9 +333,14 @@ namespace RedPill
                                 System.Environment.Exit(-1);
                             }
 
+                            double rand = r.NextDouble();
+                            //Console.WriteLine("random value:" + rand);
+                            //Console.WriteLine(mitigationMapDataObjectList[mitigationMapDataIndex].mitigations[i]);
 
-                            if( mitValue >= r.NextDouble())
+                            if( mitValue >= rand)
                             {
+                                //Console.WriteLine("blocked");
+
                                 if (evasionShield >= r.NextDouble())
                                 {
                                     tempEvent.savedByShield = true;
@@ -338,11 +349,13 @@ namespace RedPill
                                 if(System.Enum.IsDefined(typeof(bonusStage),tempEvent.currentStage.ToString()))
                                 {
                                     tempEvent.softBlockedByList.Add(mitigationMapDataObjectList[mitigationMapDataIndex].mitigations[i]);
+                                    tempEvent.softBlockedByScoreList.Add(1.0/agentsRemaining);
                                     tempEvent.wasSoftBlocked = true;
                                 }
                                 else
                                 {
                                     tempEvent.blockedByList.Add(mitigationMapDataObjectList[mitigationMapDataIndex].mitigations[i]);
+                                    tempEvent.blockedByScoreList.Add(1.0/agentsRemaining);
                                     tempEvent.wasBlocked = true;
                                 }
                             }
