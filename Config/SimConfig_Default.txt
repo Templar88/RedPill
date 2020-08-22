@@ -1,7 +1,7 @@
 numScriptKiddies=0
-numFMA=0
+numFMA=10000
 numLowAndSlow=0
-numRedTeamer=1000
+numRedTeamer=0
 userLandRebootTimer=480
 serverLandRebootTimer=10000
 alertSLA=1440

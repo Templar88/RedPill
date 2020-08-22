@@ -4,6 +4,10 @@ using System.Linq;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RedPill
 {
@@ -63,6 +67,18 @@ namespace RedPill
                     }
                 }
             }
+
+            //Establish direcotry structure
+            Directory.CreateDirectory("Output");
+            Directory.CreateDirectory("Output/Layers");
+            Directory.CreateDirectory("Output/Layers/BlockPercent");
+            Directory.CreateDirectory("Output/Layers/Blocks");
+            Directory.CreateDirectory("Output/Layers/BlockScore");
+            Directory.CreateDirectory("Output/Layers/BlockSuccessDiff");
+            Directory.CreateDirectory("Output/Layers/GroupPopularity");
+            Directory.CreateDirectory("Output/Layers/Success");
+            Directory.CreateDirectory("Output/Layers/SuccessScore");
+
             // j determines which portion of confidence interval we are in 0=low 1=average 2=high
             for (int j = 0; j < 3; j++)
 			{
@@ -119,8 +135,10 @@ namespace RedPill
         public int totalBlocksByDetection = 0;
         public int totalBlocksByReboot = 0;
         public int[][] totalTTPBlocks;
+        public float[][] totalTTPBlocksScore;
         public int[][] totalTTPDetects;
         public int[][] totalTTPSuccesses;
+        public float[][] totalTTPSuccessesScore;
         public int[][] totalTTPStealthSuccesses;
         public int[] totalControlBlocks;
         public int[] totalControlSoftBlocks;
@@ -150,19 +168,24 @@ namespace RedPill
             totalTechnologyDetects = new int[mitreInfo.sourceList.Count];
             totalTechnologyDetectsScore = new double[mitreInfo.sourceList.Count];
             totalTTPBlocks = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
+            totalTTPBlocksScore = new float[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalTTPDetects = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalTTPSuccesses = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
+            totalTTPSuccessesScore = new float[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalTTPStealthSuccesses = new int[Enum.GetNames(typeof(Mitre.stage)).Length][];
             totalSuccessByType = new int[Enum.GetNames(typeof(Agent.agentType)).Length];
             totalFailureByType = new int[Enum.GetNames(typeof(Agent.agentType)).Length];
             for(int i=0;i<Enum.GetNames(typeof(Mitre.stage)).Length;i++)
             {
                 totalTTPBlocks[i] = new int[mitreInfo.countTTPByStage[i]];
+                totalTTPBlocksScore[i] = new float[mitreInfo.countTTPByStage[i]];
                 totalTTPDetects[i] = new int[mitreInfo.countTTPByStage[i]];
                 totalTTPSuccesses[i] = new int[mitreInfo.countTTPByStage[i]];
+                totalTTPSuccessesScore[i] = new float[mitreInfo.countTTPByStage[i]];
                 totalTTPStealthSuccesses[i] = new int[mitreInfo.countTTPByStage[i]];
             }
         }
+
     }
     public class ResultData
     {
@@ -177,8 +200,71 @@ namespace RedPill
         public int[] blockedStage;
         public int[] softBlockedStage;
         public string[] successTTP = new string[Enum.GetNames(typeof(Mitre.stage)).Length];
+        public float[] successScore = new float[Enum.GetNames(typeof(Mitre.stage)).Length];
         public List<Event> events = new List<Event>();
         public int failureID;
+    }
+    public class HeatmapData
+    {
+        public HeatmapData()
+        {
+            //TechniqueBlockScore = new Dictionary<string, float>();
+            techniques = new List<Technique>();
+            this.name = "Blocks Heatmap";
+            this.gradient = new Gradient();
+	        this.version = "2.2";
+	        this.domain = "mitre-enterprise";
+	        this.description = "hello, world";
+            this.selectTechniquesAcrossTactics = false;
+            this.hideDisabled = true;
+        }
+        //public Dictionary<string, float> TechniqueBlockScore { get; private set; }  
+        public string name {get; set;}
+        public Gradient gradient {get; set;}
+        public string version {get; set;}
+        public string domain {get; set;}
+        public string description {get; set;}
+        public bool selectTechniquesAcrossTactics {get; set;}
+        public bool hideDisabled {get; set;}
+        public List<Technique> techniques {get; private set;}
+
+
+        public float getMaxValue()
+        {
+            return techniques.OrderByDescending(item => item.score).First().score;
+        }
+        public float getMinValue()
+        {
+            return techniques.OrderByDescending(item => item.score).Last().score;
+        }
+    }
+    public class Gradient
+    {
+        public Gradient()
+        {
+            this.colors = new string[2];
+            this.colors[0] = "#ffffff";
+            this.colors[1] = "#ff6666";
+            this.maxValue = 5.0f;
+            this.minValue = 0.0f;
+        }
+        public float maxValue {get; set;}
+        public float minValue {get; set;}
+        public string[] colors {get; set;}
+    }
+    public class Technique
+    {
+        public Technique(string tempID, string tempTactic, float tempScore, bool tempEnabled = true)
+        {
+            this.techniqueID = tempID;
+		    this.tactic = tempTactic;
+			this.score = tempScore;
+            this.enabled = tempEnabled;
+        }
+        public bool enabled {get; set;}
+        public string techniqueID {get; set;}
+        public string tactic {get; set;}
+        public float score {get; set;}
     }
     public class Agent
     {
@@ -759,6 +845,10 @@ namespace RedPill
             if (!nextEvent.wasBlocked && !nextEvent.wasSoftBlocked)
             {
                 attackSuccess = true;
+                if(numAgents > aggregateData.runningFailureCount)
+                {
+                    myResultData.successScore[(int)nextEvent.currentStage] += nextEvent.successScore;
+                }
             }
             else if (nextEvent.wasBlocked)
             {
@@ -779,6 +869,7 @@ namespace RedPill
             }
             return attackSuccess;
         }
+
         public void dumpData()
         {
             for(int j=0;j<aggregateData.totalBlockedStages.Length;j++)
@@ -799,7 +890,17 @@ namespace RedPill
                 {
                     //Console.WriteLine("Block stage" + (int)myResultData.events[i].currentStage);
                     //Console.WriteLine("Block TTPStageIndex " + mitreInfo.TTPNameToStageIndexValue(myResultData.events[i].TTPName,myResultData.events[i].currentStage));
+                    float blockScore = 0.0f;
+                    if (myResultData.events[i].blockedByScoreList.Count > 0)
+                    {
+                        blockScore += (float)myResultData.events[i].blockedByScoreList[0];
+                    }
+                    if (myResultData.events[i].softBlockedByScoreList.Count > 0)
+                    {
+                        blockScore += (float)myResultData.events[i].softBlockedByScoreList[0];
+                    }
                     aggregateData.totalTTPBlocks[(int)myResultData.events[i].currentStage][mitreInfo.TTPNameToStageIndexValue(myResultData.events[i].TTPName,myResultData.events[i].currentStage)]++;
+                    aggregateData.totalTTPBlocksScore[(int)myResultData.events[i].currentStage][mitreInfo.TTPNameToStageIndexValue(myResultData.events[i].TTPName,myResultData.events[i].currentStage)] += blockScore;
                 }
                 if(myResultData.events[i].detectedByList.Count > 0)
                 {
@@ -810,6 +911,7 @@ namespace RedPill
                 if(myResultData.events[i].blockedByList.Count == 0 && myResultData.events[i].softBlockedByList.Count == 0)
                 {
                     aggregateData.totalTTPSuccesses[(int)myResultData.events[i].currentStage][mitreInfo.TTPNameToStageIndexValue(myResultData.events[i].TTPName,myResultData.events[i].currentStage)]++;
+                    aggregateData.totalTTPSuccessesScore[(int)myResultData.events[i].currentStage][mitreInfo.TTPNameToStageIndexValue(myResultData.events[i].TTPName,myResultData.events[i].currentStage)]+=myResultData.events[i].successScore;
                 }                
                 if(myResultData.events[i].detectedByList.Count + myResultData.events[i].blockedByList.Count + myResultData.events[i].softBlockedByList.Count == 0)
                 {
@@ -919,6 +1021,14 @@ namespace RedPill
         //Main Simulation class
         public Mitre mitreInfo;
         public Agent[] agents;
+        public HeatmapData TTPBlockHeatmap;
+        public HeatmapData TTPSuccessHeatmap;
+        public HeatmapData TTPBlockSuccessDiffHeatmap;
+        public HeatmapData TTPBlockPercentHeatmap;
+        public HeatmapData TTPBlockScoreHeatmap;
+        public HeatmapData TTPSuccessScoreHeatmap;
+        public HeatmapData TTPGroupHeatmap;
+        
         public AggregateData aggregateData;
         public enum EnvironmentType{User,Server,Retail,DMZ,ExternalServer}// user = user endpoints, server = internal servers, retail = retail store, DMZ = external facing servers (no crit data), ExternalServer = internal server that is exposed to web
         EnvironmentType myEnvironment;
@@ -929,6 +1039,13 @@ namespace RedPill
         {
             isFinished = false;
             myEnvironment = environmentType;
+            TTPBlockHeatmap= new HeatmapData();
+            TTPSuccessHeatmap= new HeatmapData();
+            TTPBlockSuccessDiffHeatmap = new HeatmapData();
+            TTPBlockPercentHeatmap = new HeatmapData();
+            TTPBlockScoreHeatmap = new HeatmapData();
+            TTPSuccessScoreHeatmap = new HeatmapData();
+            TTPGroupHeatmap = new HeatmapData();
             confidenceBand = tempConfidenceBand;
             numIterations = 1;  //hard-coded for now
             //Number of agents
@@ -1027,6 +1144,18 @@ namespace RedPill
                 agents[i].confidenceBand = confidenceBand;
                 agents[i].numAgents = numAgents;
             }
+        }
+        public void writeFile(string fileName, string output)
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Output/" + fileName, true))
+            {
+                file.WriteLine(output);
+            }
+        }
+        public void writeJSONFile(string fileName, HeatmapData obj)
+        {
+            string jsonString = JsonSerializer.Serialize<HeatmapData>(obj);
+            File.WriteAllText("Output/" + fileName, jsonString);
         }
         public void update()
         {
@@ -1161,33 +1290,99 @@ namespace RedPill
                     Console.WriteLine("Total DetectsScore by " + mitreInfo.sourceList[i].name + ": " + aggregateData.totalTechnologyDetectsScore[i]);
                 //}
             }
-
+            
             int k=0;
             for(int i=0;i<aggregateData.totalTTPBlocks.Length;i++)
             {
                 for(int j=0;j<aggregateData.totalTTPBlocks[i].Length;j++)
                 {
-                    //if(aggregateData.totalTTPBlocks[i][j] > 0)
-                    //{
-                        Console.WriteLine("Total Blocks of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPBlocks[i][j]);
-                    //}                    
-                    //if(aggregateData.totalTTPDetects[i][j] > 0)
-                    //{
-                        Console.WriteLine("Total Detects of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPDetects[i][j]);
-                    //}
-                    //if(aggregateData.totalTTPStealthSuccesses[i][j] > 0)
-                    //{
-                        Console.WriteLine("Total Stealth Successes of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPStealthSuccesses[i][j]);
-                    //}
-                    //if(aggregateData.totalTTPSuccesses[i][j] > 0)
-                    //{
-                        Console.WriteLine("Total Successes of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPSuccesses[i][j]);
-                    //}
+                    Console.WriteLine("Total Blocks of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPBlocks[i][j]);
+                    //writeFile(myEnvironment + "BlocksByID" + confidenceBand,mitreInfo.TTPIDList[k]+": " + aggregateData.totalTTPBlocks[i][j]);
+                    Technique tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocks[i][j]);
+                    TTPBlockHeatmap.techniques.Add(tempTech);                        
+                        
+                    Console.WriteLine("Total Detects of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPDetects[i][j]);
+                        
+                    Console.WriteLine("Total Stealth Successes of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPStealthSuccesses[i][j]);
+                        
+                    Console.WriteLine("Total Successes of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPSuccesses[i][j]);
 
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPSuccesses[i][j]);
+                    TTPSuccessHeatmap.techniques.Add(tempTech);
 
+                    int diff = aggregateData.totalTTPBlocks[i][j] - aggregateData.totalTTPSuccesses[i][j];
+
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)diff));
+                    TTPBlockSuccessDiffHeatmap.techniques.Add(tempTech);                          
+                        
+                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 50)
+                    {
+                        int total = aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j];
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)aggregateData.totalTTPBlocks[i][j]/total));
+                        TTPBlockPercentHeatmap.techniques.Add(tempTech);
+                    }   
+                    else
+                    {
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],0f,false);
+                        TTPBlockPercentHeatmap.techniques.Add(tempTech);
+                    }
+
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocksScore[i][j]);
+                    TTPBlockScoreHeatmap.techniques.Add(tempTech); 
+                                       
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPSuccessesScore[i][j]);
+                    TTPSuccessScoreHeatmap.techniques.Add(tempTech); 
+                                    
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)mitreInfo.TTPGroupCountList[k]);
+                    TTPGroupHeatmap.techniques.Add(tempTech); 
+                    
                     k++;
                 }
             }
+            //block heatmap
+            TTPBlockHeatmap.gradient.maxValue = (float)TTPBlockHeatmap.getMaxValue();
+            TTPBlockHeatmap.gradient.minValue = (float)TTPBlockHeatmap.getMinValue();
+            TTPBlockHeatmap.name = "Raw Blocks";
+            writeJSONFile("Layers\\Blocks\\" + myEnvironment + "BlocksByTTPID" + confidenceBand + ".json",TTPBlockHeatmap);
+            //success heatmap
+            TTPSuccessHeatmap.gradient.maxValue = (float)TTPSuccessHeatmap.getMaxValue();
+            TTPSuccessHeatmap.gradient.minValue = (float)TTPSuccessHeatmap.getMinValue();
+            TTPSuccessHeatmap.name = "Raw Successes";
+            writeJSONFile("Layers\\Success\\" + myEnvironment + "SuccessByTTPID" + confidenceBand + ".json",TTPSuccessHeatmap);
+            //blocks - success heatmap
+            TTPBlockSuccessDiffHeatmap.gradient.maxValue = (float)TTPBlockSuccessDiffHeatmap.getMaxValue();
+            TTPBlockSuccessDiffHeatmap.gradient.minValue = (float)TTPBlockSuccessDiffHeatmap.getMinValue();
+            TTPBlockSuccessDiffHeatmap.name = "BlockSuccessDiff";
+            TTPBlockSuccessDiffHeatmap.gradient.colors[0] = "#FF0000"; //low bad
+            TTPBlockSuccessDiffHeatmap.gradient.colors[1] = "#008000"; // high good
+            writeJSONFile("Layers\\BlockSuccessDiff\\" + myEnvironment + "BlockSuccessDiffByTTPID" + confidenceBand + ".json",TTPBlockSuccessDiffHeatmap);
+            //block percent Heatmap
+            TTPBlockPercentHeatmap.gradient.maxValue = (float)TTPBlockPercentHeatmap.getMaxValue();
+            TTPBlockPercentHeatmap.gradient.minValue = (float)TTPBlockPercentHeatmap.getMinValue();
+            TTPBlockPercentHeatmap.name = "BlockPercent";
+            TTPBlockPercentHeatmap.gradient.colors[0] = "#FF0000"; //low bad
+            TTPBlockPercentHeatmap.gradient.colors[1] = "#008000"; // high good
+            writeJSONFile("Layers\\BlockPercent\\" + myEnvironment + "BlockPercentByTTPID" + confidenceBand + ".json",TTPBlockPercentHeatmap);
+            //block score Heatmap
+            TTPBlockScoreHeatmap.gradient.maxValue = (float)TTPBlockScoreHeatmap.getMaxValue();
+            TTPBlockScoreHeatmap.gradient.minValue = (float)TTPBlockScoreHeatmap.getMinValue();
+            TTPBlockScoreHeatmap.name = "BlockScore";
+            TTPBlockScoreHeatmap.gradient.colors[0] = "#FF0000"; //low bad
+            TTPBlockScoreHeatmap.gradient.colors[1] = "#008000"; // high good
+            writeJSONFile("Layers\\BlockScore\\" + myEnvironment + "BlockScoreByTTPID" + confidenceBand + ".json",TTPBlockScoreHeatmap);
+            //Success score Heatmap
+            TTPSuccessScoreHeatmap.gradient.maxValue = (float)TTPSuccessScoreHeatmap.getMaxValue();
+            TTPSuccessScoreHeatmap.gradient.minValue = (float)TTPSuccessScoreHeatmap.getMinValue();
+            TTPSuccessScoreHeatmap.name = "SuccessScore";
+            TTPSuccessScoreHeatmap.gradient.colors[0] = "#008000"; //low good
+            TTPSuccessScoreHeatmap.gradient.colors[1] = "#FF0000"; // high bad
+            writeJSONFile("Layers\\SuccessScore\\" + myEnvironment + "SuccessScoreByTTPID" + confidenceBand + ".json",TTPSuccessScoreHeatmap);
+            //block score Heatmap
+            TTPGroupHeatmap.gradient.maxValue = (float)TTPGroupHeatmap.getMaxValue();
+            TTPGroupHeatmap.gradient.minValue = (float)TTPGroupHeatmap.getMinValue();
+            TTPGroupHeatmap.name = "TechniquePopularityGroup";
+            writeJSONFile("Layers\\GroupPopularity\\" + myEnvironment + "TechniquePopularityGroup" + confidenceBand + ".json",TTPGroupHeatmap);
+
             /*
             for(int i=0;i<mitreInfo.controlObjectList.Count;i++)
             {

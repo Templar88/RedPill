@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj": {}
+    "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj": {}
   },
   "projects": {
-    "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj": {
+    "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj",
+        "projectUniqueName": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj",
         "projectName": "RedPill",
-        "projectPath": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj",
+        "projectPath": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj",
         "packagesPath": "C:\\Users\\cadet\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\obj\\",
+        "outputPath": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\"

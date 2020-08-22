@@ -43,10 +43,11 @@ namespace RedPill
     }
     public class Mitigation
     {
-        public string name;
+        public string ID, name;
         public float low,high,avg;
-        public Mitigation(string tempName, float tempLow, float tempHigh)
+        public Mitigation(string tempID, string tempName, float tempLow, float tempHigh)
         {
+            ID = tempID;
             name = tempName;
             low = tempLow;
             high = tempHigh;
@@ -72,6 +73,7 @@ namespace RedPill
         public bool wasSoftBlocked = false;
         public bool wasDetected = false;
         public bool savedByShield = false;
+        public float successScore = 0.0f;
         public List<string> detectedByList = new List<string>();
         public List<double> detectedByScoreList = new List<double>();
         public List<string> blockedByList = new List<string>();
@@ -184,6 +186,7 @@ namespace RedPill
         public simulationType mySimType = simulationType.tool;
         public Simulation.EnvironmentType myEnvironment;
         public int[] countTTPByStage = new int[Enum.GetNames(typeof(Mitre.stage)).Length];
+        public Dictionary<stage,string> formalStage = new Dictionary<stage, string>();
 
         public Mitre(string tempSetMitigation, string tempValueMit, string tempSetDataSource, string tempValueData, Simulation.EnvironmentType tempType)
         {
@@ -192,6 +195,16 @@ namespace RedPill
             setDataSource = tempSetDataSource;
             ValueData = tempValueData;
             myEnvironment = tempType;
+            formalStage.Add(stage.InitialAccess,"initial-access");
+            formalStage.Add(stage.Execution,"execution");
+            formalStage.Add(stage.Persistence,"persistence");
+            formalStage.Add(stage.PrivilegeEscalation,"privilege-escalation");
+            formalStage.Add(stage.DefenseEvasion,"defense-evasion");
+            formalStage.Add(stage.CredentialAccess,"credential-access");
+            formalStage.Add(stage.LateralMovement,"lateral-movement");
+            formalStage.Add(stage.Collection,"collection");
+            formalStage.Add(stage.Exfiltration,"exfiltration");
+            
         }
 
         public int TTPNameToIndexValue(string ttp)
@@ -209,7 +222,11 @@ namespace RedPill
         public int SourceMapDataTTPNameToIndexValue(string ttp)
         {
             return sourceMapDataObjectList.IndexOf(sourceMapDataObjectList.Find(i => i.TTPName == ttp));
-        }      
+        } 
+        public string SourceMapDataTTPNameToTTPID(string ttp)
+        {
+            return sourceMapDataObjectList.Find(i => i.TTPName == ttp).TTPID;
+        }  
         public int SourceNameToIndexValue(string sName)
         {
             return sourceList.IndexOf(sourceList.Find(i => i.name == sName));
@@ -221,6 +238,10 @@ namespace RedPill
         public int MitigationMapDataTTPNameToIndexValue(string mTTP)
         {
             return mitigationMapDataObjectList.IndexOf(mitigationMapDataObjectList.Find(i => i.TTPName == mTTP));
+        }
+        public string MitigationMapDataTTPNameToTTPID(string mTTP)
+        {
+            return mitigationMapDataObjectList.Find(i => i.TTPName == mTTP).TTPID;
         }
         public List<Mitigation> getMitigations()
         {
@@ -361,6 +382,10 @@ namespace RedPill
                             }
                         }
                     }
+                    if(!tempEvent.wasBlocked && !tempEvent.wasSoftBlocked)
+                    {
+                        tempEvent.successScore = (float)1.0f/agentsRemaining;
+                    }
                 break;
                 default:
                 break;
@@ -460,7 +485,7 @@ namespace RedPill
                         {
                             values[3] = valueMit;
                         }
-                        mitigationList.Add(new Mitigation(values[1],Single.Parse(values[3].Split(";")[0]),Single.Parse(values[3].Split(";")[1])));
+                        mitigationList.Add(new Mitigation(values[0],values[1],Single.Parse(values[3].Split(";")[0]),Single.Parse(values[3].Split(";")[1])));
                     }
                 }
             }
