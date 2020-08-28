@@ -49,7 +49,7 @@ namespace RedPill
                 {
                     try
                     {
-                        string[] lines = System.IO.File.ReadAllLines(@"Config\" + args[i+1]);
+                        string[] lines = System.IO.File.ReadAllLines(@"Config" + Path.DirectorySeparatorChar + args[i+1]);
                         numScriptKiddies = Int32.Parse(lines[0].Split('=')[1]);
                         numFMA = Int32.Parse(lines[1].Split('=')[1]);
                         numLowAndSlow = Int32.Parse(lines[2].Split('=')[1]);
