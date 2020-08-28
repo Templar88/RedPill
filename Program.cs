@@ -1147,7 +1147,7 @@ namespace RedPill
         }
         public void writeFile(string fileName, string output)
         {
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Output/" + fileName, true))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Output" + Path.DirectorySeparatorChar + fileName, true))
             {
                 file.WriteLine(output);
             }
@@ -1155,7 +1155,7 @@ namespace RedPill
         public void writeJSONFile(string fileName, HeatmapData obj)
         {
             string jsonString = JsonSerializer.Serialize<HeatmapData>(obj);
-            File.WriteAllText("Output/" + fileName, jsonString);
+            File.WriteAllText("Output" + Path.DirectorySeparatorChar + fileName, jsonString);
         }
         public void update()
         {
@@ -1339,49 +1339,50 @@ namespace RedPill
                     k++;
                 }
             }
+            string blocksPath = Path.Combine((new[] {"Layers", "Blocks"})) + Path.DirectorySeparatorChar;
             //block heatmap
             TTPBlockHeatmap.gradient.maxValue = (float)TTPBlockHeatmap.getMaxValue();
             TTPBlockHeatmap.gradient.minValue = (float)TTPBlockHeatmap.getMinValue();
             TTPBlockHeatmap.name = "Raw Blocks";
-            writeJSONFile("Layers\\Blocks\\" + myEnvironment + "BlocksByTTPID" + confidenceBand + ".json",TTPBlockHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "BlocksByTTPID" + confidenceBand + ".json",TTPBlockHeatmap);
             //success heatmap
             TTPSuccessHeatmap.gradient.maxValue = (float)TTPSuccessHeatmap.getMaxValue();
             TTPSuccessHeatmap.gradient.minValue = (float)TTPSuccessHeatmap.getMinValue();
             TTPSuccessHeatmap.name = "Raw Successes";
-            writeJSONFile("Layers\\Success\\" + myEnvironment + "SuccessByTTPID" + confidenceBand + ".json",TTPSuccessHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "SuccessByTTPID" + confidenceBand + ".json",TTPSuccessHeatmap);
             //blocks - success heatmap
             TTPBlockSuccessDiffHeatmap.gradient.maxValue = (float)TTPBlockSuccessDiffHeatmap.getMaxValue();
             TTPBlockSuccessDiffHeatmap.gradient.minValue = (float)TTPBlockSuccessDiffHeatmap.getMinValue();
             TTPBlockSuccessDiffHeatmap.name = "BlockSuccessDiff";
             TTPBlockSuccessDiffHeatmap.gradient.colors[0] = "#FF0000"; //low bad
             TTPBlockSuccessDiffHeatmap.gradient.colors[1] = "#008000"; // high good
-            writeJSONFile("Layers\\BlockSuccessDiff\\" + myEnvironment + "BlockSuccessDiffByTTPID" + confidenceBand + ".json",TTPBlockSuccessDiffHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "BlockSuccessDiffByTTPID" + confidenceBand + ".json",TTPBlockSuccessDiffHeatmap);
             //block percent Heatmap
             TTPBlockPercentHeatmap.gradient.maxValue = (float)TTPBlockPercentHeatmap.getMaxValue();
             TTPBlockPercentHeatmap.gradient.minValue = (float)TTPBlockPercentHeatmap.getMinValue();
             TTPBlockPercentHeatmap.name = "BlockPercent";
             TTPBlockPercentHeatmap.gradient.colors[0] = "#FF0000"; //low bad
             TTPBlockPercentHeatmap.gradient.colors[1] = "#008000"; // high good
-            writeJSONFile("Layers\\BlockPercent\\" + myEnvironment + "BlockPercentByTTPID" + confidenceBand + ".json",TTPBlockPercentHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "BlockPercentByTTPID" + confidenceBand + ".json",TTPBlockPercentHeatmap);
             //block score Heatmap
             TTPBlockScoreHeatmap.gradient.maxValue = (float)TTPBlockScoreHeatmap.getMaxValue();
             TTPBlockScoreHeatmap.gradient.minValue = (float)TTPBlockScoreHeatmap.getMinValue();
             TTPBlockScoreHeatmap.name = "BlockScore";
             TTPBlockScoreHeatmap.gradient.colors[0] = "#FF0000"; //low bad
             TTPBlockScoreHeatmap.gradient.colors[1] = "#008000"; // high good
-            writeJSONFile("Layers\\BlockScore\\" + myEnvironment + "BlockScoreByTTPID" + confidenceBand + ".json",TTPBlockScoreHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "BlockScoreByTTPID" + confidenceBand + ".json",TTPBlockScoreHeatmap);
             //Success score Heatmap
             TTPSuccessScoreHeatmap.gradient.maxValue = (float)TTPSuccessScoreHeatmap.getMaxValue();
             TTPSuccessScoreHeatmap.gradient.minValue = (float)TTPSuccessScoreHeatmap.getMinValue();
             TTPSuccessScoreHeatmap.name = "SuccessScore";
             TTPSuccessScoreHeatmap.gradient.colors[0] = "#008000"; //low good
             TTPSuccessScoreHeatmap.gradient.colors[1] = "#FF0000"; // high bad
-            writeJSONFile("Layers\\SuccessScore\\" + myEnvironment + "SuccessScoreByTTPID" + confidenceBand + ".json",TTPSuccessScoreHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "SuccessScoreByTTPID" + confidenceBand + ".json",TTPSuccessScoreHeatmap);
             //block score Heatmap
             TTPGroupHeatmap.gradient.maxValue = (float)TTPGroupHeatmap.getMaxValue();
             TTPGroupHeatmap.gradient.minValue = (float)TTPGroupHeatmap.getMinValue();
             TTPGroupHeatmap.name = "TechniquePopularityGroup";
-            writeJSONFile("Layers\\GroupPopularity\\" + myEnvironment + "TechniquePopularityGroup" + confidenceBand + ".json",TTPGroupHeatmap);
+            writeJSONFile(blocksPath + myEnvironment + "TechniquePopularityGroup" + confidenceBand + ".json",TTPGroupHeatmap);
 
             /*
             for(int i=0;i<mitreInfo.controlObjectList.Count;i++)
