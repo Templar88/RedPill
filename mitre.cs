@@ -485,6 +485,8 @@ namespace RedPill
                         {
                             values[3] = valueMit;
                         }
+                        //Console.WriteLine("Hello?");
+                        //Console.WriteLine(values[0] + " " + values[1] + " " + values[3]);
                         mitigationList.Add(new Mitigation(values[0],values[1],Single.Parse(values[3].Split(";")[0]),Single.Parse(values[3].Split(";")[1])));
                     }
                 }

@@ -5,7 +5,7 @@ numRedTeamer=0
 userLandRebootTimer=480
 serverLandRebootTimer=10000
 alertSLA=1440
-environmentAttackChain=User,Server
+environmentAttackChain=Retail
 
 ----Make no change above besides values to configurable values--- 
 #comments go down here
