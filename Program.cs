@@ -72,6 +72,7 @@ namespace RedPill
             Directory.CreateDirectory("Output");
             Directory.CreateDirectory("Output/Layers");
             Directory.CreateDirectory("Output/Layers/BlockPercent");
+            Directory.CreateDirectory("Output/Layers/SuccessPercent");
             Directory.CreateDirectory("Output/Layers/Blocks");
             Directory.CreateDirectory("Output/Layers/BlockScore");
             Directory.CreateDirectory("Output/Layers/BlockSuccessDiff");
@@ -1025,6 +1026,7 @@ namespace RedPill
         public HeatmapData TTPSuccessHeatmap;
         public HeatmapData TTPBlockSuccessDiffHeatmap;
         public HeatmapData TTPBlockPercentHeatmap;
+        public HeatmapData TTPSuccessPercentHeatmap;
         public HeatmapData TTPBlockScoreHeatmap;
         public HeatmapData TTPSuccessScoreHeatmap;
         public HeatmapData TTPGroupHeatmap;
@@ -1043,6 +1045,7 @@ namespace RedPill
             TTPSuccessHeatmap= new HeatmapData();
             TTPBlockSuccessDiffHeatmap = new HeatmapData();
             TTPBlockPercentHeatmap = new HeatmapData();
+            TTPSuccessPercentHeatmap = new HeatmapData();
             TTPBlockScoreHeatmap = new HeatmapData();
             TTPSuccessScoreHeatmap = new HeatmapData();
             TTPGroupHeatmap = new HeatmapData();
@@ -1315,7 +1318,7 @@ namespace RedPill
                     tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)diff));
                     TTPBlockSuccessDiffHeatmap.techniques.Add(tempTech);                          
                         
-                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 50)
+                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 10)
                     {
                         int total = aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j];
                         tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)aggregateData.totalTTPBlocks[i][j]/total));
@@ -1325,6 +1328,17 @@ namespace RedPill
                     {
                         tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],0f,false);
                         TTPBlockPercentHeatmap.techniques.Add(tempTech);
+                    }
+                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 10)
+                    {
+                        int total = aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j];
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)aggregateData.totalTTPSuccesses[i][j]/total));
+                        TTPSuccessPercentHeatmap.techniques.Add(tempTech);
+                    }   
+                    else
+                    {
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],0f,false);
+                        TTPSuccessPercentHeatmap.techniques.Add(tempTech);
                     }
 
                     tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocksScore[i][j]);
@@ -1364,6 +1378,13 @@ namespace RedPill
             TTPBlockPercentHeatmap.gradient.colors[0] = "#FF0000"; //low bad
             TTPBlockPercentHeatmap.gradient.colors[1] = "#008000"; // high good
             writeJSONFile(Path.Join("Layers", "BlockPercent", myEnvironment + "BlockPercentByTTPID" + confidenceBand + ".json"),TTPBlockPercentHeatmap);
+            //success percent Heatmap
+            TTPSuccessPercentHeatmap.gradient.maxValue = (float)TTPSuccessPercentHeatmap.getMaxValue();
+            TTPSuccessPercentHeatmap.gradient.minValue = (float)TTPSuccessPercentHeatmap.getMinValue();
+            TTPSuccessPercentHeatmap.name = "SuccessPercent";
+            TTPSuccessPercentHeatmap.gradient.colors[0] = "#008000"; //low good
+            TTPSuccessPercentHeatmap.gradient.colors[1] = "#FF0000"; // high bad
+            writeJSONFile(Path.Join("Layers", "SuccessPercent", myEnvironment + "SuccessPercentByTTPID" + confidenceBand + ".json"),TTPSuccessPercentHeatmap);
             //block score Heatmap
             TTPBlockScoreHeatmap.gradient.maxValue = (float)TTPBlockScoreHeatmap.getMaxValue();
             TTPBlockScoreHeatmap.gradient.minValue = (float)TTPBlockScoreHeatmap.getMinValue();

@@ -3,8 +3,10 @@
     "",
     "\\Config",
     "\\Data",
-    "\\Output"
+    "\\Data\\CompanyCompare",
+    "\\Output",
+    "\\Output\\Layers"
   ],
-  "SelectedNode": "\\Output\\Layers",
+  "SelectedNode": "\\Output",
   "PreviewInSolutionExplorer": false
 }
