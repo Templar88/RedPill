@@ -118,6 +118,11 @@ namespace RedPill
     {
         public List<string> TTPIDList = new List<string>();
         public List<string> TTPNameList = new List<string>();
+        public List<string> TTPParentList = new List<string>();
+        public List<string> TTPIDParentList = new List<string>();
+        public List<bool> TTPIsParentList = new List<bool>();
+        public List<bool> TTPIsChildList = new List<bool>();
+
         public List<int> TTPGroupCountList = new List<int>();
         public List<int> TTPSoftwareCountList = new List<int>();
 
@@ -206,7 +211,14 @@ namespace RedPill
             formalStage.Add(stage.Exfiltration,"exfiltration");
             
         }
-
+        public string TTPNameToTTPID(string ttp)
+        {
+            return TTPIDList[TTPNameToIndexValue(ttp)];
+        }
+        public string TTPIDToName(string ttp)
+        {
+            return TTPNameList[TTPIDList.IndexOf(ttp)];
+        }
         public int TTPNameToIndexValue(string ttp)
         {
             return TTPNameList.IndexOf(ttp);
@@ -661,6 +673,24 @@ namespace RedPill
                 }   
             }
 
+
+            for(int i=0;i<TTPIDList.Count;i++)
+            {
+                if (TTPIDList[i].Contains("."))
+                {
+                    TTPIsChildList.Add(true);
+                    TTPIsParentList.Add(false);
+                    TTPParentList.Add(TTPIDToName(TTPIDList[i].Split(".")[0]));
+                    TTPIDParentList.Add(TTPIDList[i]);
+                }
+                else
+                {
+                    TTPIsParentList.Add(true);
+                    TTPIsChildList.Add(false);
+                    TTPParentList.Add("None");
+                    TTPIDParentList.Add("None");
+                }
+            }
             
             for(int i=0;i<TTPGroupCountList.Count;i++)
             {
