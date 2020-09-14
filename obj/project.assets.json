@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj",
+      "projectUniqueName": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj",
       "projectName": "RedPill",
-      "projectPath": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\RedPill.csproj",
+      "projectPath": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\RedPill.csproj",
       "packagesPath": "C:\\Users\\cadet\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\cadet\\Source\\Repos\\Templar88\\RedPill\\obj\\",
+      "outputPath": "C:\\Users\\cadet\\source\\repos\\Templar88\\RedPill\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
@@ -63,7 +63,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
       }
     }
   }

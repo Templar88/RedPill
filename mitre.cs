@@ -120,6 +120,7 @@ namespace RedPill
         public List<string> TTPNameList = new List<string>();
         public List<string> TTPParentList = new List<string>();
         public List<string> TTPIDParentList = new List<string>();
+
         public List<bool> TTPIsParentList = new List<bool>();
         public List<bool> TTPIsChildList = new List<bool>();
 
@@ -210,6 +211,34 @@ namespace RedPill
             formalStage.Add(stage.Collection,"collection");
             formalStage.Add(stage.Exfiltration,"exfiltration");
             
+        }
+
+
+        public List<string> TTPIDToListOfChildTTPID(string ttp)
+        {
+            List<string> children = new List<string>();
+            
+            for (int i=0;i<TTPIDParentList.Count;i++)
+            {
+                if(ttp == TTPIDParentList[i])
+                {
+                    children.Add(TTPIDList[i]);
+                }
+            }
+            return children;
+        }
+        public List<string> TTPNameToListOfChildren(string ttp)
+        {
+            List<string> children = new List<string>();
+            
+            for (int i=0;i<TTPParentList.Count;i++)
+            {
+                if(ttp == TTPParentList[i])
+                {
+                    children.Add(TTPNameList[i]);
+                }
+            }
+            return children;
         }
         public string TTPNameToTTPID(string ttp)
         {
