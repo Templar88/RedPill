@@ -708,7 +708,7 @@ namespace RedPill
                     TTPIsChildList.Add(true);
                     TTPIsParentList.Add(false);
                     TTPParentList.Add(TTPIDToName(TTPIDList[i].Split(".")[0]));
-                    TTPIDParentList.Add(TTPIDList[i]);
+                    TTPIDParentList.Add(TTPIDList[i].Split(".")[0]);
                 }
                 else
                 {

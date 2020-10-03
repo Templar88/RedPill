@@ -213,7 +213,7 @@ namespace RedPill
             techniques = new List<Technique>();
             this.name = "Blocks Heatmap";
             this.gradient = new Gradient();
-	        this.version = "2.2";
+	        this.version = "3.0";
 	        this.domain = "mitre-enterprise";
 	        this.description = "hello, world";
             this.selectTechniquesAcrossTactics = false;
@@ -1301,6 +1301,14 @@ namespace RedPill
                 {
                     Console.WriteLine("Total Blocks of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPBlocks[i][j]);
                     //writeFile(myEnvironment + "BlocksByID" + confidenceBand,mitreInfo.TTPIDList[k]+": " + aggregateData.totalTTPBlocks[i][j]);
+                    Console.WriteLine(mitreInfo.TTPIDList[k]);
+                    List<string> children = new List<string>();
+                    children = mitreInfo.TTPIDToListOfChildTTPID(mitreInfo.TTPIDList[k]);
+                    for( int l=0; l<children.Count; l++)
+                    {
+                        Console.WriteLine(children[l]);
+
+                    }
                     Technique tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocks[i][j]);
                     TTPBlockHeatmap.techniques.Add(tempTech);                        
                         

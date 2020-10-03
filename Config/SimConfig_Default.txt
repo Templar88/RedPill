@@ -1,5 +1,5 @@
 numScriptKiddies=0
-numFMA=10000
+numFMA=1000
 numLowAndSlow=0
 numRedTeamer=0
 userLandRebootTimer=480

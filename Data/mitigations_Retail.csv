@@ -38,5 +38,5 @@ M1019,Threat Intelligence Program,A threat intelligence program helps an organiz
 M1051,Update Software,Perform regular software updates to mitigate exploitation risk.,.0;.0
 M1052,User Account Control,Configure Windows User Account Control to mitigate risk of adversaries obtaining elevated process access.,.0;.0
 M1018,User Account Management,Manage the creation modification use and permissions associated to user accounts.,.0;.0
-M1017,User Training,Train users to to be aware of access or manipulation attempts by an adversary to reduce the risk of successful spearphishing social engineering and other techniques that involve user interaction.,.0;.0
+M1017,User Training,Train users to to be aware of access or manipulation attempts by an adversary to reduce the risk of successful spearphishing social engineering and other techniques that involve user interaction.,.8;.9
 M1016,Vulnerability Scanning,Vulnerability scanning is used to find potentially exploitable software vulnerabilities to remediate them.,.0;.0
