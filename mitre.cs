@@ -351,7 +351,6 @@ namespace RedPill
                     int mitigationMapDataIndex = MitigationMapDataTTPNameToIndexValue(nameTTP);
                     //Console.WriteLine("trying skill: " + nameTTP);
                     //rand = r.NextDouble();
-                    //Console.WriteLine(nameTTP + " " + sourceMapDataIndex);
                     if(sourceMapDataObjectList[sourceMapDataIndex].isMonitored)
                     {
                         for (int i=0;i<sourceMapDataObjectList[sourceMapDataIndex].sources.Count;i++)
@@ -464,7 +463,7 @@ namespace RedPill
         //Need to update
         public void LoadDetectionSources()
         {
-            using(var reader = new StreamReader(@"Data/data_source.csv"))
+            using(var reader = new StreamReader(@"Data/data_source_V7.csv"))
             {
                 int i = 0;
                 int k = 0;
@@ -489,7 +488,6 @@ namespace RedPill
                     else
                     {
                         tempStage = (((stage)(k-1)).ToString() + "-"); 
-                        //Console.WriteLine(tempStage + values[1]);
                         sourceMapDataObjectList.Add(new SourceMapData(tempStage+values[1],values[0],index,(stage)k-1));
                         for (int j=2;j<values.Length;j++)
                         {
@@ -536,7 +534,7 @@ namespace RedPill
 
         public void LoadMitigationSources()
         {
-            using(var reader = new StreamReader(@"Data/mitigation_source.csv"))
+            using(var reader = new StreamReader(@"Data/mitigation_source_V7.csv"))
             {
                 int i = 0;
                 int k = 0;
@@ -583,7 +581,7 @@ namespace RedPill
 
         public void LoadTTP()
         {
-            using(var reader = new StreamReader(@"Data/TTP.csv"))
+            using(var reader = new StreamReader(@"Data/TTP_V7.csv"))
             {
                 int i = 0;
                 int k = 1;
