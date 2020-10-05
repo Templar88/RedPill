@@ -1293,7 +1293,7 @@ namespace RedPill
                     Console.WriteLine("Total DetectsScore by " + mitreInfo.sourceList[i].name + ": " + aggregateData.totalTechnologyDetectsScore[i]);
                 //}
             }
-            
+            int totalOffset = 0;
             int k=0;
             for(int i=0;i<aggregateData.totalTTPBlocks.Length;i++)
             {
@@ -1301,15 +1301,27 @@ namespace RedPill
                 {
                     Console.WriteLine("Total Blocks of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPBlocks[i][j]);
                     //writeFile(myEnvironment + "BlocksByID" + confidenceBand,mitreInfo.TTPIDList[k]+": " + aggregateData.totalTTPBlocks[i][j]);
-                    Console.WriteLine(mitreInfo.TTPIDList[k]);
-                    List<string> children = new List<string>();
-                    children = mitreInfo.TTPIDToListOfChildTTPID(mitreInfo.TTPIDList[k]);
+                    //List<string> children = new List<string>();
+                    var children = mitreInfo.TTPIDToListOfChildTTPID(mitreInfo.TTPIDList[k]).Distinct().ToList();
+                    float totalTTPBlocksWithChild = (float)aggregateData.totalTTPBlocks[i][j];
+                    float totalTTPDetectsWithChild = (float)aggregateData.totalTTPDetects[i][j];
+                    float totalTTPStealthSuccessesWithChild = (float)aggregateData.totalTTPStealthSuccesses[i][j];
+                    float totalTTPSuccessesWithChild = (float)aggregateData.totalTTPSuccesses[i][j];
+                    float totalTTPBlocksScoreWithChild = (float)aggregateData.totalTTPBlocksScore[i][j];
+                    float totalTTPSuccessesScoreWithChild = (float)aggregateData.totalTTPSuccessesScore[i][j];
+                    float TTPGroupCountListWithChild = (float)mitreInfo.TTPGroupCountList[k];
                     for( int l=0; l<children.Count; l++)
                     {
-                        Console.WriteLine(children[l]);
-
+                        int index = mitreInfo.TTPNameToStageIndexValue(mitreInfo.TTPIDToStageTTPName(children[l],(Mitre.stage)i),(Mitre.stage)i);
+                        totalTTPBlocksWithChild += (float)aggregateData.totalTTPBlocks[i][index];
+                        totalTTPDetectsWithChild += (float)aggregateData.totalTTPDetects[i][index];
+                        totalTTPStealthSuccessesWithChild += (float)aggregateData.totalTTPStealthSuccesses[i][index];
+                        totalTTPSuccessesWithChild += (float)aggregateData.totalTTPSuccesses[i][index];
+                        totalTTPBlocksScoreWithChild += (float)aggregateData.totalTTPBlocksScore[i][index];
+                        totalTTPSuccessesScoreWithChild += (float)aggregateData.totalTTPSuccessesScore[i][index];
+                        TTPGroupCountListWithChild += (float)mitreInfo.TTPGroupCountList[mitreInfo.TTPNameToIndexValue(mitreInfo.TTPIDToName(children[l]))];
                     }
-                    Technique tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocks[i][j]);
+                    Technique tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)totalTTPBlocksWithChild);
                     TTPBlockHeatmap.techniques.Add(tempTech);                        
                         
                     Console.WriteLine("Total Detects of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPDetects[i][j]);
@@ -1318,18 +1330,18 @@ namespace RedPill
                         
                     Console.WriteLine("Total Successes of " + mitreInfo.TTPNameList[k] + ": " + aggregateData.totalTTPSuccesses[i][j]);
 
-                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPSuccesses[i][j]);
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)totalTTPSuccessesWithChild);
                     TTPSuccessHeatmap.techniques.Add(tempTech);
 
-                    int diff = aggregateData.totalTTPBlocks[i][j] - aggregateData.totalTTPSuccesses[i][j];
+                    float diff = totalTTPBlocksWithChild - totalTTPSuccessesWithChild;
 
                     tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)diff));
                     TTPBlockSuccessDiffHeatmap.techniques.Add(tempTech);                          
                         
-                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 10)
+                    if(totalTTPBlocksWithChild + totalTTPSuccessesWithChild > 10)
                     {
-                        int total = aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j];
-                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)aggregateData.totalTTPBlocks[i][j]/total));
+                        float total = (float)totalTTPBlocksWithChild + (float)totalTTPSuccessesWithChild;
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)totalTTPBlocksWithChild/total));
                         TTPBlockPercentHeatmap.techniques.Add(tempTech);
                     }   
                     else
@@ -1337,10 +1349,10 @@ namespace RedPill
                         tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],0f,false);
                         TTPBlockPercentHeatmap.techniques.Add(tempTech);
                     }
-                    if(aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j] > 10)
+                    if(totalTTPBlocksWithChild + totalTTPSuccessesWithChild > 10)
                     {
-                        int total = aggregateData.totalTTPBlocks[i][j] + aggregateData.totalTTPSuccesses[i][j];
-                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)aggregateData.totalTTPSuccesses[i][j]/total));
+                        float total = (float)totalTTPBlocksWithChild + (float)totalTTPSuccessesWithChild;
+                        tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],((float)totalTTPSuccessesWithChild/total));
                         TTPSuccessPercentHeatmap.techniques.Add(tempTech);
                     }   
                     else
@@ -1349,13 +1361,13 @@ namespace RedPill
                         TTPSuccessPercentHeatmap.techniques.Add(tempTech);
                     }
 
-                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPBlocksScore[i][j]);
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)totalTTPBlocksScoreWithChild);
                     TTPBlockScoreHeatmap.techniques.Add(tempTech); 
                                        
-                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)aggregateData.totalTTPSuccessesScore[i][j]);
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)totalTTPSuccessesScoreWithChild);
                     TTPSuccessScoreHeatmap.techniques.Add(tempTech); 
                                     
-                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)mitreInfo.TTPGroupCountList[k]);
+                    tempTech = new Technique(mitreInfo.TTPIDList[k],mitreInfo.formalStage[(Mitre.stage)i],(float)TTPGroupCountListWithChild);
                     TTPGroupHeatmap.techniques.Add(tempTech); 
                     
                     k++;

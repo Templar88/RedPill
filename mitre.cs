@@ -256,6 +256,10 @@ namespace RedPill
         {
             return (TTPNameList.IndexOf(ttp) - vertToCount[verticalList[(int)ttpStage]]);
         }
+        public string TTPIDToStageTTPName(string ttpID, stage ttpStage)
+        {
+            return ttpStage.ToString() + "-" + TTPNameList[TTPIDList.IndexOf(ttpID)].Split(new[] {'-'}, 2)[1];
+        }
         public int ControlNameToIndexValue(string control)
         {
             return controlObjectList.IndexOf(controlObjectList.Find(i => i.tool == control));
