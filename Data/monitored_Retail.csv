@@ -1,47 +1,51 @@
 Monitored,Range
-Access tokens,.0;.0
-Anti-virus,.0;.0
-API monitoring,.0;.0
-Application logs,.0;.0
-Asset management,.0;.0
-Authentication logs,.0;.0
-AWS CloudTrail logs,.0;.0
-Azure activity logs,.0;.0
-BIOS,.0;.0
-Binary file metadata,.0;.0
-Data loss prevention,.0;.0
-Detonation chamber,.0;.0
-DLL monitoring,.0;.0
-DNS records,.0;.0
-Email gateway,.0;.0
-Environment variable,.0;.0
-File monitoring,.0;.0
-Host network interface,.0;.0
-Kernel drivers,.0;.0
-Loaded DLLs,.0;.0
-Mail server,.0;.0
-Malware reverse engineering,.0;.0
-MBR,.0;.0
-Named Pipes,.0;.0
-Netflow/Enclave netflow,.0;.0
-Network device logs,.0;.0
-Network intrusion detection system,.0;.0
-Network protocol analysis,.0;.0
-Office 365 account logs,.0;.0
-Packet capture,.0;.0
-PowerShell logs,.0;.0
-Process command-line parameters,.0;.0
-Process monitoring,.0;.0
-Process use of network,.0;.0
-Services,.0;.0
-SSL/TLS inspection,.0;.0
-Stackdriver logs,.0;.0
-System calls,.0;.0
-Third-party application logs,.0;.0
-User interface,.0;.0
-Web application firewall logs,.0;.0
-Web logs,.0;.0
-Web proxy,.0;.0
-Windows Error Reporting,.0;.0
-Windows event logs,.0;.0
-Windows Registry,.0;.0
+Access tokens.,.4;.6
+Anti-virus.,.4;.6
+API monitoring.,.4;.6
+Application logs.,.4;.6
+Asset management.,.4;.6
+Authentication logs.,.4;.6
+AWS CloudTrail logs.,.4;.6
+Azure activity logs.,.4;.6
+BIOS.,.4;.6
+Binary file metadata.,.4;.6
+Browser extensions.,.4;.6
+Component firmware.,.4;.6
+Data loss prevention.,.4;.6
+Detonation chamber.,.4;.6
+Disk forensics.,.4;.6
+DLL monitoring.,.4;.6
+DNS records.,.4;.6
+Email gateway.,.4;.6
+Environment variable.,.4;.6
+File monitoring.,.4;.6
+Host network interface.,.4;.6
+Kernel drivers.,.4;.6
+Loaded DLLs.,.4;.6
+Mail server.,.4;.6
+Malware reverse engineering.,.4;.6
+MBR.,.4;.6
+Named Pipes.,.4;.6
+Netflow/Enclave netflow.,.4;.6
+Network device logs.,.4;.6
+Network intrusion detection system.,.4;.6
+Network protocol analysis.,.4;.6
+Office 365 account logs.,.4;.6
+Packet capture.,.4;.6
+PowerShell logs.,.4;.6
+Process command-line parameters.,.4;.6
+Process monitoring.,.4;.6
+Process use of network.,.4;.6
+Services.,.4;.6
+SSL/TLS inspection.,.4;.6
+Stackdriver logs.,.4;.6
+System calls.,.4;.6
+Third-party application logs.,.4;.6
+User interface.,.4;.6
+Web application firewall logs.,.4;.6
+Web logs.,.4;.6
+Web proxy.,.4;.6
+Windows Error Reporting.,.4;.6
+Windows event logs.,.4;.6
+Windows Registry.,.4;.6
+WMI Objects.,.4;.6

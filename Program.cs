@@ -574,7 +574,7 @@ namespace RedPill
             }
             if(isDetected)
             {
-                alertTimer+=60;
+                alertTimer+=120;
                 if(alertTimer >= alertSLA  && hasAlerted == false)
                 {
                     aggregateData.totalBlocksByDetection++;

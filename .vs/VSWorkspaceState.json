@@ -3,10 +3,8 @@
     "",
     "\\Config",
     "\\Data",
-    "\\Data\\CompanyCompare",
-    "\\Output",
-    "\\Output\\Layers"
+    "\\Output"
   ],
-  "SelectedNode": "\\Data\\mitigations_DMZ.csv",
+  "SelectedNode": "\\Data\\mitigations_User.csv",
   "PreviewInSolutionExplorer": false
 }

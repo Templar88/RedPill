@@ -366,6 +366,7 @@ namespace RedPill
                             }
 
                             float sourceVal=0.0f;
+                            //Console.WriteLine(sourceMapDataObjectList[sourceMapDataIndex].sources[i]);
                             if(confBand == 0) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].low;
                             else if(confBand == 1) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].avg;
                             else if(confBand ==2) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].high;
