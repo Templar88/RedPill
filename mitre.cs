@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+
 
 namespace RedPill
 {
@@ -45,6 +47,9 @@ namespace RedPill
     {
         public string ID, name;
         public float low,high,avg;
+        public List<string> techIDs;
+        public List<string> techNames;
+        public List<string> Recommendations;
         public Mitigation(string tempID, string tempName, float tempLow, float tempHigh)
         {
             ID = tempID;
@@ -52,6 +57,9 @@ namespace RedPill
             low = tempLow;
             high = tempHigh;
             avg = (low+high)/(float)2.0;
+            techIDs = new List<string>();
+            techNames = new List<string>();
+            Recommendations = new List<string>();
         }
     }
     public class Source
@@ -278,7 +286,7 @@ namespace RedPill
         }
         public int MitigationNameToIndexValue(string mName)
         {
-            return mitigationList.IndexOf(mitigationList.Find(i => i.name == mName));
+            return mitigationList.IndexOf(mitigationList.Find(i => i.name.ToLower() == mName.ToLower()));
         }
         public int MitigationMapDataTTPNameToIndexValue(string mTTP)
         {
@@ -298,7 +306,9 @@ namespace RedPill
         }
         public Event tryTTP(int confBand, string nameTTP, string location, int tempAgentID, stage currentStage, float tempEvasionShield, int agentsRemaining)
         {
+            //Console.WriteLine(nameTTP);
             int index = TTPNameToIndexValue(nameTTP);
+            //Console.WriteLine(index);
             Random r = new Random();
             Event tempEvent = new Event();
             tempEvent.currentStage = currentStage;
@@ -366,7 +376,6 @@ namespace RedPill
                             }
 
                             float sourceVal=0.0f;
-                            //Console.WriteLine(sourceMapDataObjectList[sourceMapDataIndex].sources[i]);
                             if(confBand == 0) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].low;
                             else if(confBand == 1) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].avg;
                             else if(confBand ==2) sourceVal = sourceList[SourceNameToIndexValue(sourceMapDataObjectList[sourceMapDataIndex].sources[i])].high;
@@ -398,6 +407,7 @@ namespace RedPill
                                 Console.WriteLine("Impossible ConfBand.  Exiting...");
                                 System.Environment.Exit(-1);
                             }
+                            //Console.WriteLine(mitValue);
 
                             double rand = r.NextDouble();
                             //Console.WriteLine("random value:" + rand);
@@ -567,6 +577,7 @@ namespace RedPill
                         mitigationMapDataObjectList.Add(new MitigationMapData(tempStage+values[1],values[0],index,(stage)k-1));
                         for (int j=2;j<values.Length;j++)
                         {
+                            //Console.WriteLine(values[j]);
                             if(!string.IsNullOrEmpty(values[j]))
                             {
                                 mitigationMapDataObjectList[index].mitigations.Add(values[j]);
@@ -577,6 +588,7 @@ namespace RedPill
                             }
                         }
                         index++;
+                        //Console.WriteLine(index);
                     }
                 }
             }
@@ -733,6 +745,38 @@ namespace RedPill
                 //Console.WriteLine(i.ToString() + " " + controlObjectList[i].detectValueList[10]);
             }
             
+        }
+
+        public void LoadMitigationRecommendations()
+        {
+            if (!Directory.Exists("data/mitigationrecommendations/"))
+        	{
+                return;
+        	}
+            string[] files = Directory.GetFiles(@"data/mitigationrecommendations/", "*");
+            foreach (var path in files)
+	        {
+                string mit = path.Split('/')[2].Split('.')[0];
+                mit = mit.Replace('_','/');
+                mit = Regex.Replace(mit, "([a-z])([A-Z])", "$1 $2");
+                if(mit == "SSL/TLSInspection")
+                {
+                    mit = "SSL/TLS Inspection";
+                }
+                //Console.WriteLine(mit);
+                //Console.WriteLine(MitigationNameToIndexValue(mit));
+                using(var reader = new StreamReader(path))
+                {
+                    while(!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        var values = line.Split(',');
+                        mitigationList[MitigationNameToIndexValue(mit)].techIDs.Add(values[0]+values[1]);
+                        mitigationList[MitigationNameToIndexValue(mit)].techNames.Add(values[2]);
+                        mitigationList[MitigationNameToIndexValue(mit)].Recommendations.Add(values[3]);
+                    }
+                }
+            }
         }
     }
 }

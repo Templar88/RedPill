@@ -18,7 +18,6 @@ T1200,Hardware Additions,Asset management,Data loss prevention,
 T1189,Drive-by Compromise,Packet capture,Network device logs,Process use of network,Web proxy,Network intrusion detection system,SSL/TLS inspection,
 T1566.003,Spearphishing via Service,SSL/TLS inspection,Anti-virus,Web proxy,
 T1078.003,Local Accounts,Authentication logs,
-T1078.004,Cloud Accounts
 TA0002,execution
 T1053.005,Scheduled Task,File monitoring,Process command-line parameters,Process monitoring,Windows event logs,
 T1047,Windows Management Instrumentation,Authentication logs,Netflow/Enclave netflow,Process monitoring,Process command-line parameters,
@@ -45,8 +44,6 @@ T1059.005,Visual Basic,DLL monitoring,Loaded DLLs,File monitoring,Process monito
 T1204.001,Malicious Link,Anti-virus,Process monitoring,Web proxy,
 T1569.002,Service Execution,Windows Registry,Process monitoring,Process command-line parameters,
 T1053.002,At (Windows),File monitoring,Process command-line parameters,Process monitoring,Windows event logs,
-T1059.004,Unix Shell
-T1053.003,Cron
 TA0003,persistence
 T1053.005,Scheduled Task,File monitoring,Process command-line parameters,Process monitoring,Windows event logs,
 T1037,Boot or Logon Initialization Scripts,File monitoring,Process monitoring,
@@ -57,6 +54,7 @@ T1133,External Remote Services,Authentication logs,
 T1542.001,System Firmware,EFI,BIOS,API monitoring,
 T1574.011,Services Registry Permissions Weakness,Windows Registry,Services,Process command-line parameters,
 T1542.003,Bootkit,VBR,MBR,API monitoring,
+T1547,Boot or Logon Autostart Execution,
 T1543.003,Windows Service,API monitoring,Windows event logs,Process command-line parameters,Process monitoring,File monitoring,Windows Registry,
 T1137,Office Application Startup,Mail server,Process monitoring,Process command-line parameters,Windows Registry,File monitoring,
 T1574.001,DLL Search Order Hijacking,Process command-line parameters,Process monitoring,DLL monitoring,File monitoring,
@@ -119,11 +117,6 @@ T1546.007,Netsh Helper DLL,Process command-line parameters,Process monitoring,Wi
 T1505.001,SQL Stored Procedures,Application logs,
 T1078.003,Local Accounts,Authentication logs,
 T1574.012,COR_PROFILER,Windows Registry,File monitoring,Process monitoring,Process command-line parameters,
-T1574.006,LD_PRELOAD
-T1053.003,Cron
-T1136.003,Cloud Accounts
-T1136.003,Cloud Account
-T1543.002,Systemd Service
 TA0004,privilege-escalation
 T1055.011,Extra Window Memory Injection,Process monitoring,API monitoring,
 T1053.005,Scheduled Task,File monitoring,Process command-line parameters,Process monitoring,Windows event logs,
@@ -133,6 +126,7 @@ T1546.013,PowerShell Profile,PowerShell logs,File monitoring,Process command-lin
 T1543,Create or Modify System Process,Windows event logs,Windows Registry,File monitoring,Process command-line parameters,Process monitoring,
 T1548.002,Bypass User Access Control,Windows Registry,Process command-line parameters,Process monitoring,
 T1574.011,Services Registry Permissions Weakness,Windows Registry,Services,Process command-line parameters,
+T1547,Boot or Logon Autostart Execution,
 T1543.003,Windows Service,API monitoring,Windows event logs,Process command-line parameters,Process monitoring,File monitoring,Windows Registry,
 T1574.001,DLL Search Order Hijacking,Process command-line parameters,Process monitoring,DLL monitoring,File monitoring,
 T1053,Scheduled Task/Job,File monitoring,Process monitoring,Process command-line parameters,Windows event logs,
@@ -149,7 +143,7 @@ T1548,Abuse Elevation Control Mechanism,Windows Registry,File monitoring,Process
 T1134.002,Create Process with Token,Process command-line parameters,Process monitoring,Access tokens,API monitoring,
 T1547.004,Winlogon Helper DLL,Windows Registry,File monitoring,Process monitoring,
 T1546.012,Image File Execution Options Injection,API monitoring,Windows event logs,Windows Registry,Process command-line parameters,Process monitoring,
-T1055.013,Process Doppelgänging,File monitoring,Process monitoring,API monitoring,
+T1055.013,Process Doppel,File monitoring,Process monitoring,API monitoring,
 T1574.005,Executable Installer File Permissions Weakness,Process command-line parameters,File monitoring,
 T1546.008,Accessibility Features,Process command-line parameters,Process monitoring,File monitoring,Windows Registry,
 T1055.004,Asynchronous Procedure Call,Process monitoring,API monitoring,
@@ -187,11 +181,6 @@ T1055.001,Dynamic-link Library Injection,Process monitoring,DLL monitoring,File 
 T1546.007,Netsh Helper DLL,Process command-line parameters,Process monitoring,Windows Registry,DLL monitoring,
 T1078.003,Local Accounts,Authentication logs,
 T1574.012,COR_PROFILER,Windows Registry,File monitoring,Process monitoring,Process command-line parameters,
-T1055.013,Process Doppel
-T1574.006,LD_PRELOAD
-T1053.003,Cron
-T1078.004,Cloud Accounts
-T1543.002,Systemd Service
 TA0005,defense-evasion
 T1055.011,Extra Window Memory Injection,Process monitoring,API monitoring,
 T1218.011,Rundll32,DLL monitoring,Loaded DLLs,Process command-line parameters,Process monitoring,
@@ -239,7 +228,7 @@ T1548,Abuse Elevation Control Mechanism,Windows Registry,File monitoring,Process
 T1134.002,Create Process with Token,Process command-line parameters,Process monitoring,Access tokens,API monitoring,
 T1108,Redundant Access,Office 365 account logs,Azure activity logs,AWS CloudTrail logs,Stackdriver logs,Process monitoring,Process use of network,Packet capture,Network protocol analysis,File monitoring,Authentication logs,Binary file metadata,
 T1218.008,Odbcconf,Loaded DLLs,Process command-line parameters,Process monitoring,
-T1055.013,Process Doppelgänging,File monitoring,Process monitoring,API monitoring,
+T1055.013,Process Doppel,File monitoring,Process monitoring,API monitoring,
 T1574.005,Executable Installer File Permissions Weakness,Process command-line parameters,File monitoring,
 T1562.006,Indicator Blocking,Process command-line parameters,Process monitoring,Sensor health and status,
 T1036.002,Right-to-Left Override,File monitoring,
@@ -304,13 +293,6 @@ T1078.003,Local Accounts,Authentication logs,
 T1211,Exploitation for Defense Evasion,Windows Error Reporting,Process monitoring,File monitoring,
 T1127,Trusted Developer Utilities Proxy Execution,File monitoring,Process monitoring,
 T1574.012,COR_PROFILER,Windows Registry,File monitoring,Process monitoring,Process command-line parameters,
-T1078.004,Cloud Accounts
-T1222.002,Linux and Mac File and Directory Permissions Modification
-T1070.003,Clear Command History
-T1574.006,LD_PRELOAD
-T1055.013,Process Doppel
-T1550.001,Application Access Token
-T1070.002,Clear Linux or Mac System Logs
 TA0006,credential-access
 T1557,Man-in-the-Middle,File monitoring,Netflow/Enclave netflow,Packet capture,
 T1056.001,Keylogging,Windows Registry,Process monitoring,API monitoring,
@@ -350,7 +332,6 @@ T1558.003,Kerberoasting,Authentication logs,Windows event logs,
 T1003.006,DCSync,Windows event logs,
 T1556,Modify Authentication Process,File monitoring,Authentication logs,API monitoring,Windows Registry,Process monitoring,DLL monitoring,
 T1056.004,Credential API Hooking,Windows event logs,Process monitoring,Loaded DLLs,DLL monitoring,Binary file metadata,API monitoring,
-T1528,Steal Application Access Token
 TA0008,lateral-movement
 T1021.005,VNC,Process use of network,Network protocol analysis,Netflow/Enclave netflow,
 T1080,Taint Shared Content,File monitoring,Process monitoring,
@@ -371,9 +352,6 @@ T1570,Lateral Tool Transfer,Process command-line parameters,File monitoring,Pack
 T1563.002,RDP Hijacking,Process monitoring,Netflow/Enclave netflow,Authentication logs,
 T1550.002,Pass the Hash,Authentication logs,
 T1021.001,Remote Desktop Protocol,Process monitoring,Netflow/Enclave netflow,Authentication logs,
-T1528,Steal Application Access Token
-T1021.004,SSH,Authentication logs,Netflow/Enclave netflow,Network protocol analysis,Process use of network
-T1550.001,Application Access Token,OAuth audit logs, Office 365 audit logs
 TA0009,collection
 T1113,Screen Capture,API monitoring,Process monitoring,File monitoring,
 T1557,Man-in-the-Middle,File monitoring,Netflow/Enclave netflow,Packet capture,

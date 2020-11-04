@@ -181,7 +181,7 @@ T1027,Obfuscated Files or Information,36,104
 T1502,Parent PID Spoofing,0,1
 T1150,Plist Modification,0,0
 T1205,Port Knocking,0,2
-T1186,Process Doppelgänging,0,1
+T1186,Process Doppel,0,1
 T1093,Process Hollowing,3,11
 T1055,Process Injection,12,49
 T1108,Redundant Access,7,1

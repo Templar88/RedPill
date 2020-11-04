@@ -1072,6 +1072,7 @@ namespace RedPill
             mitreInfo.LoadDeployedMitigations();
             mitreInfo.LoadMitigationSources();
             mitreInfo.LoadTTP();
+            mitreInfo.LoadMitigationRecommendations();
             //Data aggregation object
             aggregateData = new AggregateData(mitreInfo);
             // Set Skill Lists for each agent type
@@ -1309,6 +1310,21 @@ namespace RedPill
                     float totalTTPSuccessesWithChild = (float)aggregateData.totalTTPSuccesses[i][j];
                     float totalTTPBlocksScoreWithChild = (float)aggregateData.totalTTPBlocksScore[i][j];
                     float totalTTPSuccessesScoreWithChild = (float)aggregateData.totalTTPSuccessesScore[i][j];
+                    int sourceMapDataIndex = mitreInfo.SourceMapDataTTPNameToIndexValue(mitreInfo.TTPNameList[k]);
+                    int mitigationMapDataIndex = mitreInfo.MitigationMapDataTTPNameToIndexValue(mitreInfo.TTPNameList[k]);
+                    if (Directory.Exists("data/mitigationrecommendations/"))
+	                {
+                        //Console.WriteLine(mitreInfo.TTPNameList[k]);
+                        for (int z=0; z < mitreInfo.mitigationMapDataObjectList[mitigationMapDataIndex].mitigations.Count;z++)
+                        {
+                            //Console.WriteLine(mitreInfo.TTPNameList[k]);
+                            //Console.WriteLine(mitreInfo.mitigationList[mitreInfo.MitigationNameToIndexValue(mitreInfo.mitigationMapDataObjectList[mitigationMapDataIndex].mitigations[z])].Recommendations[0]);
+                        }
+                        Environment.Exit(0); 
+	                }
+
+                    //Console.WriteLine(mitreInfo.mitigationMapDataObjectList[mitreInfo.MitigationMapDataTTPNameToIndexValue(mitreInfo.TTPNameList[k])].)
+                    //writeFile("/Recommendations/recommendations.csv",mitreInfo.TTPNameList[k] + mitreInfo.mitigationList[mitreInfo.TTPNameToIndexValue(mitreInfo)])
                     float TTPGroupCountListWithChild = (float)mitreInfo.TTPGroupCountList[k];
                     for( int l=0; l<children.Count; l++)
                     {
